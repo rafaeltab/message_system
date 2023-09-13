@@ -1,0 +1,15 @@
+{
+    "name": "socket-service",
+    "version": "0.0.1",
+    "private": true,
+    "main": "src/index.ts",
+    "scripts": {
+        "start": "bun .",
+        "docker:build": "docker build -t rafaeltab/socket-service -f ./Dockerfile ../.."
+    },
+    "dependencies": {
+        "@types/uuid": "^9.0.3",
+        "bun-types": "^1.0.1",
+        "uuid": "^9.0.1"
+    }
+}
