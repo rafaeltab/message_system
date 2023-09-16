@@ -1,0 +1,6 @@
+package com.message.v1;
+
+message User {
+    required string user_id = 1;
+}
+

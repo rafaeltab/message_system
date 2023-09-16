@@ -1,0 +1,6 @@
+package com.message.v1;
+
+message Message {
+    required string content = 1;
+    required int64 sent_at = 2;
+}
