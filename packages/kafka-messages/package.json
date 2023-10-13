@@ -1,0 +1,30 @@
+{
+    "name": "kafka-messages",
+    "version": "0.0.1",
+    "private": true,
+    "files": [
+        "dist/**/*.js"
+    ],
+    "types": [
+        "dist/**/*.d.ts"
+    ],
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "rimraf dist/ && tsc",
+        "test": "vitest run"
+    },
+    "type": "module",
+    "dependencies": {
+        "ajv": "^8.12.0",
+        "glob": "^10.3.4",
+        "typescript": "^5.2.2"
+    },
+    "devDependencies": {
+        "@types/node": "^20.6.2",
+        "ajv-formats": "^2.1.1",
+        "barrelsby": "^2.8.1",
+        "rimraf": "^5.0.1",
+        "ts-node": "^10.9.1",
+        "vitest": "^0.34.6"
+    }
+}

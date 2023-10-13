@@ -1,0 +1,4 @@
+
+> kafka-messages@0.0.1 build /home/rafaeltab/source/message_system/packages/kafka-messages
+> rimraf dist/ && tsc
+

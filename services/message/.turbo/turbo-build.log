@@ -1,0 +1,4 @@
+
+> message-service@0.0.1 build /home/rafaeltab/source/message_system/services/message
+> rimraf dist/ && tsc
+

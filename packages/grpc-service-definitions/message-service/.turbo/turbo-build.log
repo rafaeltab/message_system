@@ -1,0 +1,4 @@
+
+> message-service-grpc@0.0.1 build /home/rafaeltab/source/message_system/packages/grpc-service-definitions/message-service
+> rimraf dist/ && tsc
+

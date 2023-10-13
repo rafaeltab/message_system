@@ -1,0 +1,28 @@
+{
+    "name": "message-service-grpc",
+    "version": "0.0.1",
+    "private": true,
+    "files": [
+       "dist/**/*.js"
+    ],
+    "types": [
+        "dist/**/*.d.ts"  
+    ],
+    "scripts": {
+        "gen:buf": "rimraf /proto/ts/ && proto-loader-gen-types  --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=proto/ts/ proto/services/message/v1/*.proto && pnpm run patch:buf",
+        "patch:buf": "ts-node --esm ./patch/proto.ts",
+        "build": "rimraf dist/ && tsc"
+    },
+    "type": "module",
+    "dependencies": {
+        "@grpc/grpc-js": "^1.9.3",
+        "@grpc/proto-loader": "^0.7.9",
+        "glob": "^10.3.4",
+        "typescript": "^5.2.2"
+    },
+    "devDependencies": {
+        "rimraf": "^5.0.1",
+        "ts-morph": "^19.0.0",
+        "ts-node": "^10.9.1"
+    }
+}

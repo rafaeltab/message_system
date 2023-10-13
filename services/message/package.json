@@ -2,23 +2,33 @@
     "name": "message-service",
     "version": "0.0.1",
     "private": true,
-    "main": "src/index.ts",
+    "main": "dist/index.js",
     "scripts": {
-        "start": "ts-node src/index.ts",
-        "docker:build": "docker build -t rafaeltab/message-service -f ./Dockerfile ../.."
+        "start": "node --es-module-specifier-resolution node .",
+        "docker:build": "docker build -t rafaeltab/message-service -f ./Dockerfile ../..",
+        "clean": "rimraf dist/",
+        "build": "rimraf dist/ && tsc"
     },
     "type": "module",
     "dependencies": {
         "@grpc/grpc-js": "^1.9.3",
+        "@grpc/proto-loader": "^0.7.9",
         "@types/uuid": "^9.0.3",
-        "bun-types": "^1.0.1",
-        "google-protobuf": "^3.21.2",
-        "ts-node": "^10.9.1",
+        "ajv": "^8.12.0",
+        "glob": "^10.3.4",
+        "inversify": "^6.0.1",
+        "kafkajs": "^2.2.4",
+        "message-service-grpc": "workspace:*",
+        "reflect-metadata": "^0.1.13",
         "typescript": "^5.2.2",
-        "uuid": "^9.0.1"
+        "uuid": "^9.0.1",
+        "kafka-messages": "workspace:*"
     },
     "devDependencies": {
-        "grpc-tools": "^1.12.4",
-        "grpc_tools_node_protoc_ts": "^5.3.3"
+        "@types/node": "^20.6.2",
+        "copyfiles": "^2.4.1",
+        "rimraf": "^5.0.1",
+        "ts-morph": "^19.0.0",
+        "ts-node": "^10.9.1"
     }
 }
