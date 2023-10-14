@@ -6,8 +6,8 @@
     "scripts": {
         "start": "node --es-module-specifier-resolution node .",
         "docker:build": "docker build -t rafaeltab/message-service -f ./Dockerfile ../..",
-        "clean": "rimraf dist/",
-        "build": "rimraf dist/ && tsc"
+        "build": "pnpm run clean && tsc",
+        "clean": "rimraf dist/"
     },
     "type": "module",
     "dependencies": {
