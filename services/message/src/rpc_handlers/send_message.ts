@@ -19,6 +19,7 @@ export class SendMessageHandler extends MessageHandler<SendMessageRequest__Outpu
                 cause: null
             }, null];
 
+            var sentAt = new Date();
 
             var message: SendMessageRequestedMessageModel = {
                 chat: {
@@ -31,7 +32,7 @@ export class SendMessageHandler extends MessageHandler<SendMessageRequest__Outpu
                 },
                 type: SendMessageRequestedStrategy.type,
                 content: req.content,
-                created_at: (new Date()).toISOString()
+                created_at: sentAt.toISOString()
             }
 
             this.sendMessageTopic.send({
@@ -41,7 +42,7 @@ export class SendMessageHandler extends MessageHandler<SendMessageRequest__Outpu
 
             return [null, {
                 msg: {
-                    sentAt: message.created_at,
+                    sentAt: sentAt.valueOf().toString(),
                     content: message.content
                 }
             }];

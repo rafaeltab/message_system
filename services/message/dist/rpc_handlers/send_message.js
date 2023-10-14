@@ -25,6 +25,7 @@ let SendMessageHandler = class SendMessageHandler extends MessageHandler {
                         code: 5,
                         cause: null
                     }, null];
+            var sentAt = new Date();
             var message = {
                 chat: {
                     to_user: {
@@ -36,7 +37,7 @@ let SendMessageHandler = class SendMessageHandler extends MessageHandler {
                 },
                 type: SendMessageRequestedStrategy.type,
                 content: req.content,
-                created_at: (new Date()).toISOString()
+                created_at: sentAt.toISOString()
             };
             this.sendMessageTopic.send({
                 key: `${req.chat.toUser.userId}-${req.chat.fromUser.userId}`,
@@ -44,7 +45,7 @@ let SendMessageHandler = class SendMessageHandler extends MessageHandler {
             });
             return [null, {
                     msg: {
-                        sentAt: message.created_at,
+                        sentAt: sentAt.valueOf().toString(),
                         content: message.content
                     }
                 }];
