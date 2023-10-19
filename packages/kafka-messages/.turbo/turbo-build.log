@@ -1,4 +1,8 @@
 
 > kafka-messages@0.0.1 build /home/rafaeltab/source/message_system/packages/kafka-messages
-> rimraf dist/ && tsc
+> pnpm run clean && tsc
+
+
+> kafka-messages@0.0.1 clean /home/rafaeltab/source/message_system/packages/kafka-messages
+> rimraf dist/
 

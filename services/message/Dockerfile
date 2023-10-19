@@ -13,7 +13,7 @@ FROM base as pruner
 # This would be faster, but is less modular and requires editing the Dockerfile for each app.
 # Simply personal preference here.
 COPY . .
-RUN turbo prune --scope=gateway-service --docker
+RUN turbo prune --scope=message-service --docker
 
 # Create a layer for installing modules
 FROM base AS installer

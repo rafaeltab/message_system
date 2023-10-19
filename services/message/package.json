@@ -22,7 +22,8 @@
         "reflect-metadata": "^0.1.13",
         "typescript": "^5.2.2",
         "uuid": "^9.0.1",
-        "kafka-messages": "workspace:*"
+        "kafka-messages": "workspace:*",
+        "utils": "workspace:*"
     },
     "devDependencies": {
         "@types/node": "^20.6.2",

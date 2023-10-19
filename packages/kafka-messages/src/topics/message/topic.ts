@@ -1,7 +1,7 @@
 import { Topic } from "../../types/topic";
 
 export class MessageTopic implements Topic {
-    getTopic(): String {
+    getTopic(): string {
         return "message";
     }
 }

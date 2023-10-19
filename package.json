@@ -1,5 +1,5 @@
 {
-  "name": "message_systen",
+  "name": "message_system",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,7 +14,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bun": "^1.0.1",
     "turbo": "^1.10.13"
   }
 }

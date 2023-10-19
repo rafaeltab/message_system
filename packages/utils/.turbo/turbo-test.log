@@ -1,0 +1,17 @@
+
+> kafka-messages@0.0.1 test /home/rafaeltab/source/message_system/packages/kafka-messages
+> vitest run
+
+
+ RUN  v0.34.6 /home/rafaeltab/source/message_system/packages/kafka-messages
+
+ ✓ src/topics/notification/send_message_notification.test.ts  (2 tests) 3ms
+ ✓ src/topics/notification/reveive_message_notification.test.ts  (2 tests) 2ms
+ ✓ src/topics/message/send_message_complete.test.ts  (2 tests) 5ms
+ ✓ src/topics/message/send_message_requested.test.ts  (2 tests) 6ms
+
+ Test Files  4 passed (4)
+      Tests  8 passed (8)
+   Start at  16:37:38
+   Duration  1.68s (transform 148ms, setup 0ms, collect 409ms, tests 16ms, environment 0ms, prepare 2.43s)
+

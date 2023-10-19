@@ -1,7 +1,7 @@
 import { Topic } from "../../types/topic";
 
 export class NotificationTopic implements Topic {
-    getTopic(): String {
+    getTopic(): string {
         return "notificaiton";
     }
 }

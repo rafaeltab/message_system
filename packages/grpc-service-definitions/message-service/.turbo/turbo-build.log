@@ -1,4 +1,8 @@
 
 > message-service-grpc@0.0.1 build /home/rafaeltab/source/message_system/packages/grpc-service-definitions/message-service
-> rimraf dist/ && tsc
+> pnpm run clean && tsc
+
+
+> message-service-grpc@0.0.1 clean /home/rafaeltab/source/message_system/packages/grpc-service-definitions/message-service
+> rimraf dist/
 

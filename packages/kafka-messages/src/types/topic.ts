@@ -1,3 +1,3 @@
 export interface Topic {
-    getTopic(): String;
+    getTopic(): string;
 }
