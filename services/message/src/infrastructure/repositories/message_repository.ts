@@ -4,7 +4,9 @@ import { Chat } from "../../domain/aggregates/chat";
 import { Message } from "../../domain/aggregates/message";
 import { IMessageRepository } from "../../domain/repository/message_repository";
 import { User } from "../../domain/aggregates/user";
+import { injectable } from "inversify";
 
+@injectable()
 export class MessageRepository extends IMessageRepository {
     constructor(private postConn: PostgressConnection) {
         super();

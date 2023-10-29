@@ -3,8 +3,9 @@ import { Chat } from "../../domain/aggregates/chat";
 import { User } from "../../domain/aggregates/user";
 import { IChatRepository } from "../../domain/repository/chat_repository";
 import { PostgressConnection } from "../../db/postgres";
-import postgres from "postgres";
+import { injectable } from "inversify";
 
+@injectable()
 export class ChatRepository extends IChatRepository {
     constructor(private postConn: PostgressConnection) {
         super();

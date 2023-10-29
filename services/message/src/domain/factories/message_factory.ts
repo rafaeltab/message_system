@@ -33,7 +33,7 @@ export class MessageFactory {
             chat = chatResult.asOk().value.unwrap()!;
         }
 
-        const createResult = (await this._messageRepository.createMessage(chat, content, sentAt)).unwrap();
+        const createResult = (await this._messageRepository.createMessage(chat, content, sentAt, fromUser.asOk().value)).unwrap();
 
         return new Result.Ok(createResult);
     }

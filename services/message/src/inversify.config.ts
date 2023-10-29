@@ -10,6 +10,12 @@ import { SendMessageTopic } from "./kafka/topics/send_message";
 import { KafkaAdmin } from "./kafka/admin";
 import { MessageParser, strategies } from "kafka-messages";
 import { PostgressConnection } from "./db/postgres";
+import { UserRepository } from "./infrastructure/repositories/user_repository";
+import { IUserRepository } from "./domain/repository/user_repository";
+import { IMessageRepository } from "./domain/repository/message_repository";
+import { MessageRepository } from "./infrastructure/repositories/message_repository";
+import { IChatRepository } from "./domain/repository/chat_repository";
+import { ChatRepository } from "./infrastructure/repositories/chat_repository";
 
 const container = new Container();
 container.bind<GetMessageHandler>(GetMessageHandler).to(GetMessageHandler);
@@ -24,6 +30,10 @@ container.bind(PostgressConnection).to(PostgressConnection).inSingletonScope();
 
 container.bind(SendMessageTopic).to(SendMessageTopic);
 container.bind(SendMessageKafkaHandler).to(SendMessageKafkaHandler);
+
+container.bind(IUserRepository).to(UserRepository);
+container.bind(IMessageRepository).to(MessageRepository);
+container.bind(IChatRepository).to(ChatRepository);
 
 var parser = new MessageParser(strategies.map(x => new x()));
 await parser.compile();
