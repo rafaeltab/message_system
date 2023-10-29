@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "turbo": "turbo"
+    "build": "turbo run build --log-order grouped",
+    "deploy": "cd ./infra && ./generate.sh && terraform apply",
+    "setup:db": "turbo run db:setup",
+    "ci": "pnpm run build && pnpm run deploy && sleep 5 && pnpm run setup:db"
   },
   "workspaces": [
     "services/*",

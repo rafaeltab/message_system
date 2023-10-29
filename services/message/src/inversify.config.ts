@@ -9,6 +9,7 @@ import { SendMessageKafkaHandler } from "./kafka_handlers/send_message";
 import { SendMessageTopic } from "./kafka/topics/send_message";
 import { KafkaAdmin } from "./kafka/admin";
 import { MessageParser, strategies } from "kafka-messages";
+import { PostgressConnection } from "./db/postgres";
 
 const container = new Container();
 container.bind<GetMessageHandler>(GetMessageHandler).to(GetMessageHandler);
@@ -19,6 +20,7 @@ container.bind(KafkaConnection).to(KafkaConnection).inSingletonScope();
 container.bind(KafkaProducer).to(KafkaProducer).inSingletonScope();
 container.bind(KafkaConsumer).to(KafkaConsumer).inSingletonScope();
 container.bind(KafkaAdmin).to(KafkaAdmin).inSingletonScope();
+container.bind(PostgressConnection).to(PostgressConnection).inSingletonScope();
 
 container.bind(SendMessageTopic).to(SendMessageTopic);
 container.bind(SendMessageKafkaHandler).to(SendMessageKafkaHandler);

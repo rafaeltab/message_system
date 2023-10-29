@@ -1,0 +1,18 @@
+{
+    "name": "message-database",
+    "version": "0.0.1",
+    "private": true,
+    "files": [
+        ".dbconfig.json"
+    ],
+    "scripts": {
+        "db:setup": "db setup",
+        "db:migrate": "db migrate",
+        "db:preview": "",
+        "db:backup": "",
+        "db:restore": ""
+    },
+    "dependencies": {
+        "database-core": "workspace:*"
+    }
+}

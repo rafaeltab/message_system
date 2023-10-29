@@ -1,0 +1,28 @@
+{
+    "name": "database-core",
+    "version": "0.0.1",
+    "private": true,
+    "scripts": {
+        "build": "node ./esbuild.config.mjs && tsc ./src/config/definition.ts --outDir ./dist --declaration",
+        "lint": "tsc --no-emit",
+        "dev": "tsc --no-emit --watch & esbuild --watch",
+        "start": "node .",
+        "showbin": "pwd"
+    },
+    "types": [
+        "dist/definition.d.ts"
+    ],
+    "main": "./dist/db.js",
+    "bin": {
+        "db": "./dist/db.js"
+    },
+    "type": "module",
+    "devDependencies": {
+        "@types/node": "^20.6.2",
+        "esbuild": "^0.19.5"
+    },
+    "dependencies": {
+        "picocolors": "^1.0.0",
+        "zod": "^3.22.4"
+    }
+}

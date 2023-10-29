@@ -1,0 +1,4 @@
+
+> database-core@0.0.1 build /home/rafaeltab/source/message_system/databases/core
+> node ./esbuild.config.mjs && tsc ./src/config/definition.ts --outDir ./dist --declaration
+

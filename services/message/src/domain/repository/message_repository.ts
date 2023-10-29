@@ -1,7 +1,8 @@
 import { Result } from "utils";
 import { Chat } from "../aggregates/chat";
 import { Message } from "../aggregates/message";
+import { User } from "../aggregates/user";
 
 export abstract class IMessageRepository {
-    abstract createMessage(chat: Chat, content: string, sentAt: string): Promise<Result<Message, Error>>;
+    abstract createMessage(chat: Chat, content: string, sentAt: string, fromUser: User): Promise<Result<Message, Error>>;
 }

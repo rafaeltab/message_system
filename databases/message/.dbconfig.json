@@ -1,0 +1,7 @@
+{
+    "host": "cockroachdb",
+    "username": "message",
+    "password": "",
+    "database": "message",
+    "changelogPath": "./src/changelog"
+}

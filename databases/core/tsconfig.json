@@ -17,11 +17,9 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "outDir": "dist",
-    "resolveJsonModule": true
+    "outDir": "dist"
   },
   "include": [
-    "proto/ts/**/*",
     "src/**/*"
   ]
 }

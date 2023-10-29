@@ -44,16 +44,20 @@ resource "kubernetes_manifest" "crdbcluster_cockroachdb" {
       }
       "cockroachDBVersion": "v23.1.4"
       "ingress" = {
-        "ui"={
-          "ingressClassName"= "nginx"
-          "host"= "database.localhost"
-        }
+        "ui" = {
+          "ingressClassName" = "nginx"
+          "host" = "database.localhost"
+        },
+        # "sql" = {
+        #   "ingressClassName" = "nginx"
+        #   "host" = "db-sql.localhost"
+        # }
       }
     }
   }
 }
 
+# echo \"CREATE DATABASE message; CREATE USER message; GRANT ALL ON DATABASE message TO message;\" | kubectl exec -it cockroachdb-client-secure -- ./cockroach sql --host=cockroachdb-public --insecure
 
+// TODO tls
 // TODO automatically create the roach user with a password from the variables
-// TODO add an ingress so the dashboard can be accessed
-// TODO make sure the thing starts on first try, if at all possible

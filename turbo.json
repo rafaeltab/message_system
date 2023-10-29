@@ -23,6 +23,15 @@
     },
     "docker:build": {
       "cache": false
+    },
+    "showbin": {
+      "cache": false
+    },
+    "db:setup": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
     }
   }
 }

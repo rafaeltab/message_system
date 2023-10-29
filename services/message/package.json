@@ -17,13 +17,16 @@
         "ajv": "^8.12.0",
         "glob": "^10.3.4",
         "inversify": "^6.0.1",
+        "kafka-messages": "workspace:*",
         "kafkajs": "^2.2.4",
+        "message-database": "workspace:*",
+        "database-core": "workspace:*",
         "message-service-grpc": "workspace:*",
+        "postgres": "^3.4.2",
         "reflect-metadata": "^0.1.13",
         "typescript": "^5.2.2",
-        "uuid": "^9.0.1",
-        "kafka-messages": "workspace:*",
-        "utils": "workspace:*"
+        "utils": "workspace:*",
+        "uuid": "^9.0.1"
     },
     "devDependencies": {
         "@types/node": "^20.6.2",
