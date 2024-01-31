@@ -1,7 +1,0 @@
-{
-    "key": "5ERXGWEUXUZXV7RY",
-    "secret": "33/hLgr0fNeaLkd2dlL1dwEqLpGrG+T/JwknFfbKSdca+UYJgR55j6sdCHljYBWt",
-    "bootstrap": {
-        "server": "pkc-1wvvj.westeurope.azure.confluent.cloud:9092"
-    }
-}
