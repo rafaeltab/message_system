@@ -1,15 +1,16 @@
 resource "helm_release" "crdb_operator" {
-    chart = "./charts/cockroach-operator"
-    name = "crdb-operator"
+  depends_on = [helm_release.nginx_ingress]
+  chart      = "./charts/cockroach-operator"
+  name       = "crdb-operator"
 }
 
 resource "kubernetes_manifest" "crdbcluster_cockroachdb" {
-    depends_on = [helm_release.crdb_operator, helm_release.nginx_ingress]
+  depends_on = [helm_release.crdb_operator, helm_release.nginx_ingress]
   manifest = {
     "apiVersion" = "crdb.cockroachlabs.com/v1alpha1"
-    "kind" = "CrdbCluster"
+    "kind"       = "CrdbCluster"
     "metadata" = {
-      "name" = "cockroachdb"
+      "name"      = "cockroachdb"
       "namespace" = "default"
     }
     "spec" = {
@@ -24,29 +25,29 @@ resource "kubernetes_manifest" "crdbcluster_cockroachdb" {
             ]
             "resources" = {
               "requests" = {
-                "storage" = "60Gi"
+                "storage" = "10Gi"
               }
             }
             "volumeMode" = "Filesystem"
           }
         }
       }
-      "nodes" = 10
+      "nodes" = 3
       "resources" = {
         "limits" = {
-          "cpu" = 2
+          "cpu"    = 2
           "memory" = "16Gi"
         }
         "requests" = {
-          "cpu" = "500m"
+          "cpu"    = "500m"
           "memory" = "2Gi"
         }
       }
-      "cockroachDBVersion": "v23.1.4"
+      "cockroachDBVersion" : "v23.1.4"
       "ingress" = {
         "ui" = {
           "ingressClassName" = "nginx"
-          "host" = "database.localhost"
+          "host"             = "database.localhost"
         },
         # "sql" = {
         #   "ingressClassName" = "nginx"
