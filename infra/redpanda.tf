@@ -2,8 +2,7 @@ resource "helm_release" "redpanda-controller" {
   name             = "redpanda-controller"
   repository       = "https://charts.redpanda.com"
   chart            = "operator"
-  namespace        = "redpanda"
-  create_namespace = true
+  namespace        = "default"
 }
 
 resource "kubernetes_manifest" "redpanda-resource" {
@@ -13,13 +12,14 @@ resource "kubernetes_manifest" "redpanda-resource" {
     kind       = "Redpanda"
     metadata = {
       name      = "redpanda"
-      namespace = "redpanda"
+      namespace = "default"
     }
     spec = {
       chartRef = {}
       clusterSpec = {
-        external = {
-          domain = "customredpandadomain.local"
+        force = true,
+        tls = {
+          enabled = true
         }
         statefulset = {
           initContainers = {
