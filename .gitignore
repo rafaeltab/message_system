@@ -3,3 +3,4 @@
 terraform.tfvars
 **/kafka.json
 cockroach-data
+.terraform.lock.hcl
