@@ -4,7 +4,7 @@ import { SendMessageResponse__Output } from "message-service-grpc/dist/proto/ts/
 import { MessageHandler } from "./message_handler";
 import { injectable, inject } from "inversify";
 import { SendMessageTopic } from "../kafka/topics/send_message";
-import { SendMessageRequestedMessageModel, SendMessageRequestedStrategy } from "kafka-messages/dist/topics/message/send_message_requested";
+import { SendMessageRequestedMessageModel, SendMessageRequestedStrategy } from "kafka-messages";
 
 @injectable()
 export class SendMessageHandler extends MessageHandler<SendMessageRequest__Output, SendMessageResponse__Output> {

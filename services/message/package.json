@@ -2,13 +2,14 @@
     "name": "message-service",
     "version": "0.0.1",
     "private": true,
-    "main": "dist/index.js",
+    "main": "dist/src/index.js",
     "scripts": {
         "start": "node --es-module-specifier-resolution node .",
         "docker:build": "docker build -t rafaeltab/message-service -f ./Dockerfile ../..",
         "build": "pnpm run clean && tsc",
         "clean": "rimraf dist/",
-        "build:docker": "turbo run docker:build"
+        "build:docker": "turbo run docker:build",
+        "dev": "tsc --build && tsc --build --watch --preserveWatchOutput & node --watch --es-module-specifier-resolution node ."
     },
     "type": "module",
     "dependencies": {

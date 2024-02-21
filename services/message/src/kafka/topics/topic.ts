@@ -42,7 +42,6 @@ export abstract class Topic {
         })
     }
 
-
     private static mapMessage(msg: KafkaMessage): Message {
         if (typeof msg == "string") return msg as Message;
         if (msg instanceof Buffer) return msg as Message;

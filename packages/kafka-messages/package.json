@@ -3,12 +3,12 @@
     "version": "0.0.1",
     "private": true,
     "files": [
-        "dist/**/*.js"
+        "dist/src/**/*.js"
     ],
     "types": [
-        "dist/**/*.d.ts"
+        "dist/src/**/*.d.ts"
     ],
-    "main": "dist/index.js",
+    "main": "dist/src/index.js",
     "scripts": {
         "build": "pnpm run clean && tsc",
         "clean": "rimraf dist/",

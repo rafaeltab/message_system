@@ -2,6 +2,6 @@ import { Topic } from "../../types/topic";
 
 export class MessageTopic implements Topic {
     getTopic(): string {
-        return "message";
+        return "message_message";
     }
 }

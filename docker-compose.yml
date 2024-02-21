@@ -47,7 +47,16 @@ services:
   message:
     build: 
       context: .
-      dockerfile: ./services/message/Dockerfile
+      dockerfile: ./services/message/dev.Dockerfile
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+        - action: rebuild
+          path: ./services/message/config
+        - action: rebuild
+          path: ./services/message/dev.dockerfile
     ports:
       - 4000:4000 
     volumes:
@@ -55,7 +64,14 @@ services:
   socket:
     build: 
       context: .
-      dockerfile: ./services/socket/Dockerfile
+      dockerfile: ./services/socket/dev.Dockerfile
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+        - action: rebuild
+          path: ./services/socket/dev.dockerfile
     ports:
       - 3000:3000
 

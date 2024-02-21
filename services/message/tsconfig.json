@@ -1,25 +1,33 @@
 {
   "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/tsconfig.json",
   "compilerOptions": {
+    "composite": true,
     // enable latest features
-    "lib": ["esnext"],
+    "lib": [
+      "esnext"
+    ],
     "module": "esnext",
     "target": "esnext",
-
     // if TS 5.x+
     "moduleResolution": "bundler",
     "moduleDetection": "force",
     "experimentalDecorators": true,
-
     "esModuleInterop": true, // allow default imports for CommonJS modules
-
     // best practices
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "outDir": "dist",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
+  "references": [
+    {
+      "path": "../../packages/kafka-messages"
+    },
+    {
+      "path": "../../databases/core"
+    }
+  ],
   "include": [
     "proto/ts/**/*",
     "src/**/*"

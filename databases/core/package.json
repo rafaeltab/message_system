@@ -5,16 +5,15 @@
     "scripts": {
         "build": "node ./esbuild.config.mjs && tsc ./src/config/definition.ts --outDir ./dist --declaration",
         "lint": "tsc --no-emit",
-        "dev": "tsc --no-emit --watch & esbuild --watch",
         "start": "node .",
         "showbin": "pwd"
     },
     "types": [
-        "dist/definition.d.ts"
+        "dist/src/**/*.d.ts"
     ],
-    "main": "./dist/db.js",
+    "main": "./dist/src/index.js",
     "bin": {
-        "db": "./dist/db.js"
+        "db": "./dist/src/db.js"
     },
     "type": "module",
     "devDependencies": {

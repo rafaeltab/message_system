@@ -5,7 +5,8 @@
     "main": "src/index.ts",
     "scripts": {
         "start": "bun .",
-        "docker:build": "docker build -t rafaeltab/socket-service -f ./Dockerfile ../.."
+        "docker:build": "docker build -t rafaeltab/socket-service -f ./Dockerfile ../..",
+        "dev": "bun --watch ."
     },
     "dependencies": {
         "@types/uuid": "^9.0.3",

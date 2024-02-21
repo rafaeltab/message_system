@@ -8,8 +8,7 @@ import { inject, injectable } from "inversify";
 import { KafkaConsumer } from "../kafka/consumer";
 import { SendMessageTopic } from "../kafka/topics/send_message";
 import { EachMessagePayload } from "kafkajs";
-import { SendMessageRequestedMessageModel, SendMessageRequestedStrategy } from "kafka-messages/dist/topics/message/send_message_requested";
-import { MessageParser } from "kafka-messages";
+import { MessageParser, SendMessageRequestedMessageModel, SendMessageRequestedStrategy } from "kafka-messages";
 
 
 @injectable()
@@ -25,6 +24,7 @@ export class SendMessageKafkaHandler {
         var consumer = await this._consumer.getConsumer("send-message-group");
         await consumer.subscribe({
             topic: this._topic.getTopic(),
+
             fromBeginning: true
         })
         await consumer.run({
@@ -37,6 +37,7 @@ export class SendMessageKafkaHandler {
         var parseResult = this._parser.parse(message.value.toString());
         if(parseResult[0] != SendMessageRequestedStrategy.type) {
             return;
+
         }
 
         const model = parseResult[1] as SendMessageRequestedMessageModel;

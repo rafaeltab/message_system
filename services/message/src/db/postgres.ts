@@ -1,6 +1,6 @@
 import postgres from "postgres";
-import type { DbConfig } from "database-core/dist/definition";
 import config from "message-database/.dbconfig.json" assert { type: "json" };
+import { DbConfig } from "database-core";
 import { injectable } from "inversify";
 
 @injectable()

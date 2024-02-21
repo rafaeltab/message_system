@@ -2,6 +2,7 @@
   "compilerOptions": {
     // add Bun type definitions
     "types": ["bun-types"],
+    "composite": true,
 
     // enable latest features
     "lib": ["esnext"],
