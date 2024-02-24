@@ -9,14 +9,16 @@ import { KafkaConsumer } from "../kafka/consumer";
 import { SendMessageTopic } from "../kafka/topics/send_message";
 import { EachMessagePayload } from "kafkajs";
 import { MessageParser, SendMessageRequestedMessageModel, SendMessageRequestedStrategy } from "kafka-messages";
-
+import { MessageFactory } from "../domain/factories/message_factory";
+import { webcrypto } from "crypto";
 
 @injectable()
 export class SendMessageKafkaHandler {
     constructor(
         @inject(KafkaConsumer) private _consumer: KafkaConsumer,
         @inject(SendMessageTopic) private _topic: SendMessageTopic,
-        @inject(MessageParser) private _parser: MessageParser
+        @inject(MessageParser) private _parser: MessageParser,
+        @inject(MessageFactory) private _messageFactory: MessageFactory,
     ) {
     }
 
@@ -33,14 +35,19 @@ export class SendMessageKafkaHandler {
     }
 
     async handleMessage({ message }: EachMessagePayload) {
-        if(message.value == null) return;
+        if (message.value == null) return;
         var parseResult = this._parser.parse(message.value.toString());
-        if(parseResult[0] != SendMessageRequestedStrategy.type) {
+        if (parseResult[0] != SendMessageRequestedStrategy.type) {
             return;
 
         }
 
         const model = parseResult[1] as SendMessageRequestedMessageModel;
-        console.log(model);
+        const msg = await this._messageFactory.createMessage(
+            model.chat.to_user.user_id,
+            model.chat.from_user.user_id,
+            model.content,
+            model.created_at);
+        console.log(msg);
     }
 }

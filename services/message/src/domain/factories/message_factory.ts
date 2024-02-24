@@ -5,9 +5,15 @@ import { User } from "../aggregates/user";
 import { Message } from "../aggregates/message";
 import { Result } from "utils";
 import { Chat } from "../aggregates/chat";
+import { inject, injectable } from "inversify";
 
+@injectable()
 export class MessageFactory {
-    constructor(private _userRepository: IUserRepository, private _chatRepository: IChatRepository, private _messageRepository: IMessageRepository) {
+    constructor(
+        @inject(IUserRepository) private _userRepository: IUserRepository,
+        @inject(IChatRepository) private _chatRepository: IChatRepository,
+        @inject(IMessageRepository) private _messageRepository: IMessageRepository
+    ) {
 
     }
 

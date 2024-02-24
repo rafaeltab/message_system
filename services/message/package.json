@@ -6,7 +6,7 @@
     "scripts": {
         "start": "node --es-module-specifier-resolution node .",
         "docker:build": "docker build -t rafaeltab/message-service -f ./Dockerfile ../..",
-        "build": "pnpm run clean && tsc",
+        "build": "pnpm run clean && tsc -b",
         "clean": "rimraf dist/",
         "build:docker": "turbo run docker:build",
         "dev": "tsc --build && tsc --build --watch --preserveWatchOutput & node --watch --es-module-specifier-resolution node ."

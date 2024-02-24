@@ -11,7 +11,8 @@
   },
   "workspaces": [
     "services/*",
-    "packages/*"
+    "packages/*",
+    "databases/*"
   ],
   "keywords": [],
   "author": "",

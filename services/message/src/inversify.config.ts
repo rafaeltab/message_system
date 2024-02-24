@@ -16,6 +16,7 @@ import { IMessageRepository } from "./domain/repository/message_repository";
 import { MessageRepository } from "./infrastructure/repositories/message_repository";
 import { IChatRepository } from "./domain/repository/chat_repository";
 import { ChatRepository } from "./infrastructure/repositories/chat_repository";
+import { MessageFactory } from "./domain/factories/message_factory";
 
 const container = new Container();
 container.bind<GetMessageHandler>(GetMessageHandler).to(GetMessageHandler);
@@ -34,6 +35,8 @@ container.bind(SendMessageKafkaHandler).to(SendMessageKafkaHandler);
 container.bind(IUserRepository).to(UserRepository);
 container.bind(IMessageRepository).to(MessageRepository);
 container.bind(IChatRepository).to(ChatRepository);
+
+container.bind(MessageFactory).to(MessageFactory);
 
 var parser = new MessageParser(strategies.map(x => new x()));
 await parser.compile();

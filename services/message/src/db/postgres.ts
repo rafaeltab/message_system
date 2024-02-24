@@ -12,8 +12,9 @@ export class PostgressConnection {
             db: dbConf.database,
             host: dbConf.host,
             ssl: "prefer",
-            password: dbConf.password == "" ? undefined : dbConf.password,
-            username: dbConf.username
+            password: dbConf.password,
+            username: dbConf.username,
+            port: dbConf.port
         });
     }
 

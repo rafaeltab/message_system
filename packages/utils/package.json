@@ -2,8 +2,8 @@
     "name": "utils",
     "version": "0.0.1",
     "private": true,
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "main": "dist/src/index.js",
+    "types": "dist/src/index.d.ts",
     "scripts": {
         "build": "pnpm run clean && pnpm run barrels && tsc",
         "clean": "rimraf dist/",

@@ -2,11 +2,11 @@ import { Option, Result } from "utils";
 import { PostgressConnection } from "../../db/postgres";
 import { User } from "../../domain/aggregates/user";
 import { IUserRepository } from "../../domain/repository/user_repository";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 
 @injectable()
 export class UserRepository extends IUserRepository {
-    constructor(private postConn: PostgressConnection) {
+    constructor(@inject(PostgressConnection) private postConn: PostgressConnection) {
         super();
     }
 

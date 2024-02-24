@@ -1,7 +1,6 @@
 {
-    "host": "cockroachdb",
-    "username": "message",
-    "password": "",
+    "host": "crdb",
     "database": "message",
-    "changelogPath": "./src/changelog"
+    "changelogPath": "./src/changelog",
+    "port": 26257
 }

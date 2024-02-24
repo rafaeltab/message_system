@@ -1,4 +1,4 @@
-import { loadConfig } from "../config/loader";
+import { loadConfig } from "../config/loader.js";
 import { spawn } from "child_process";
 
 export async function setup() {
