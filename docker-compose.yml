@@ -3,6 +3,7 @@ volumes:
   redpanda: null
 services:
   crdb:
+    container_name: crdb
     image: cockroachdb/cockroach:v19.2.2
     ports:
       - "26257:26257"
@@ -11,6 +12,7 @@ services:
     volumes:
       - "${PWD}/cockroach-data/crdb:/cockroach/cockroach-data"
   redpanda:
+    container_name: redpanda
     image: docker.redpanda.com/redpandadata/redpanda:v23.3.4
     command:
       - redpanda start

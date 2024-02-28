@@ -1,0 +1,7 @@
+{
+    "host": "crdb",
+    "driver": {
+        "name": "kubectl",
+        "pod": "cockroachdb-0" 
+    }
+}

@@ -1,6 +1,6 @@
 {
-    "host": "crdb",
     "database": "message",
     "changelogPath": "./src/changelog",
-    "port": 26257
+    "port": 26257,
+    "username": "message"
 }

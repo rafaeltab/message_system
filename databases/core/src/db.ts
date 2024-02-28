@@ -1,25 +1,34 @@
 #!/usr/bin/env node
 
-import { backup } from "./commands/backup.js";
 import { migrate } from "./commands/migrate.js";
-import { preview } from "./commands/preview.js";
-import { restore } from "./commands/restore.js";
 import { setup } from "./commands/setup.js";
 
-switch(process.argv[2]) {
-    case "migrate":
-        await migrate();
-        break;
-    case "setup":
-        await setup();
-        break;
-    case "preview":
-        await preview();
-        break;
-    case "backup":
-        await backup();
-        break;
-    case "restore":
-        await restore();
-        break;
-}
+import { Command } from "commander";
+import { loadConfig } from "./config/loader.js";
+import { GlobalOptions, addGlobalOptions } from "./global_options.js";
+
+const program = new Command("db");
+
+program
+    .name("db")
+    .description("Manage databases")
+    .version("0.0.1")
+
+addGlobalOptions(program
+    .command("migrate")
+    .description("Apply migrations to a database"))
+    .action(async (options: GlobalOptions) => {
+        const config = await loadConfig(options);
+        migrate(config, options);
+    });
+
+addGlobalOptions(program
+    .command("setup")
+    .description("Setup a database"))
+    .action(async (options: GlobalOptions) => {
+        const config = await loadConfig(options);
+        setup(config, options);
+    });
+
+program.parse();
+// TODO add preview, backup and restore

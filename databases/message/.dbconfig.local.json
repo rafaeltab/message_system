@@ -1,0 +1,7 @@
+{
+    "host": "localhost",
+    "driver": {
+        "name": "docker",
+        "container": "crdb" 
+    }
+}
