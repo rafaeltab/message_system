@@ -25,16 +25,13 @@ export class MessageRepository extends IMessageRepository {
         if (!(typeof entity == "object" &&
             entity !== null &&
             "id" in entity &&
-            typeof entity.id == "number" &&
             "content" in entity &&
             typeof entity.content == "string" &&
-            "chat" in entity &&
-            typeof entity.chat == "string" &&
             "created_at" in entity &&
-            typeof entity.created_at == "string")) {
+            typeof entity.created_at == "object" && entity.created_at instanceof Date && typeof entity.id == "bigint")) {
             return new Result.Err(Error());
         }
 
-        return new Result.Ok(new Message(entity.id, chat, fromUser, entity.content, entity.created_at));
+        return new Result.Ok(new Message(entity.id, chat, fromUser, entity.content, entity.created_at.toISOString()));
     }
 }

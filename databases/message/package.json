@@ -9,11 +9,8 @@
         ".dbconfig.kube.json"
     ],
     "scripts": {
-        "db:setup": "db setup",
-        "db:migrate": "db migrate",
-        "db:preview": "",
-        "db:backup": "",
-        "db:restore": ""
+        "db:setup": "db setup -E local",
+        "db:migrate": "db migrate -E local"
     },
     "dependencies": {
         "database-core": "workspace:*"

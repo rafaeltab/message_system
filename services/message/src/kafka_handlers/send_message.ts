@@ -10,7 +10,6 @@ import { SendMessageTopic } from "../kafka/topics/send_message";
 import { EachMessagePayload } from "kafkajs";
 import { MessageParser, SendMessageRequestedMessageModel, SendMessageRequestedStrategy } from "kafka-messages";
 import { MessageFactory } from "../domain/factories/message_factory";
-import { webcrypto } from "crypto";
 
 @injectable()
 export class SendMessageKafkaHandler {
@@ -35,18 +34,26 @@ export class SendMessageKafkaHandler {
     }
 
     async handleMessage({ message }: EachMessagePayload) {
-        if (message.value == null) return;
-        var parseResult = this._parser.parse(message.value.toString());
-        if (parseResult[0] != SendMessageRequestedStrategy.type) {
-            return;
-        }
+        try {
+            if (message.value == null) return;
+            var parseResult = this._parser.parse(message.value.toString());
+            if (parseResult[0] != SendMessageRequestedStrategy.type) {
+                return;
+            }
 
-        const model = parseResult[1] as SendMessageRequestedMessageModel;
-        const msg = await this._messageFactory.createMessage(
-            model.chat.to_user.user_id,
-            model.chat.from_user.user_id,
-            model.content,
-            model.created_at);
-        console.log("Stored a new message", msg);
+            const model = parseResult[1] as SendMessageRequestedMessageModel;
+            const msg = await this._messageFactory.createMessage(
+                BigInt(model.chat.to_user.user_id),
+                BigInt(model.chat.from_user.user_id),
+                model.content,
+                model.created_at);
+            if (msg.isErr()) {
+                throw msg.asErr().error;
+            }
+            console.log("Stored a new message", msg);
+        } catch (err) {
+            console.error(err);
+            throw "";
+        }
     }
 }

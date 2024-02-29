@@ -13,7 +13,7 @@ const schema: JSONSchemaType<SendMessageRequestedMessageModel> = {
                     "type": "object",
                     "properties": {
                         "user_id": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     },
                     "required": [
@@ -24,7 +24,7 @@ const schema: JSONSchemaType<SendMessageRequestedMessageModel> = {
                     "type": "object",
                     "properties": {
                         "user_id": {
-                            "type": "string"
+                            "type": "integer"
                         }
                     },
                     "required": [
@@ -80,10 +80,10 @@ export type SendMessageRequestedMessageModel = {
     type: string
     chat: {
         from_user: {
-            user_id: string
+            user_id: number
         },
         to_user: {
-            user_id: string
+            user_id: number
         }
     },
     content: string,

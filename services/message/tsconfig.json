@@ -19,6 +19,7 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "resolveJsonModule": true,
+    "sourceMap": true
   },
   "references": [
     {

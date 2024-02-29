@@ -2,7 +2,7 @@
 
 export interface Message {
   'content'?: (string);
-  'sentAt'?: (string | number);
+  'sentAt'?: (number | string);
 }
 
 export interface Message__Output {

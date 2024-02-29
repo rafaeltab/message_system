@@ -10,7 +10,7 @@ export class UserRepository extends IUserRepository {
         super();
     }
 
-    async createUser(userId: string): Promise<Result<User, Error>> {
+    async createUser(userId: bigint): Promise<Result<User, Error>> {
         const existing = await this.getUser(userId);
 
         if (existing.isErr()) return new Result.Err(existing.asErr().error);
@@ -27,9 +27,9 @@ export class UserRepository extends IUserRepository {
         return new Result.Ok(parsed.asOk().value);
     }
 
-    async getUser(userId: string): Promise<Result<Option<User>, Error>> {
+    async getUser(userId: bigint): Promise<Result<Option<User>, Error>> {
         const existing = await this.postConn.sql`
-            SELECT * FROM users WHERE id == ${userId};
+            SELECT * FROM users WHERE id = ${userId};
         `;
 
         if (existing.length == 0) return new Result.Ok(new Option.None());
@@ -44,8 +44,7 @@ export class UserRepository extends IUserRepository {
 function parseUser(entity: unknown): Result<User, Error> {
     if (!(typeof entity == "object" &&
         entity !== null &&
-        "id" in entity &&
-        typeof entity.id == "number")) return new Result.Err(Error());
+        "id" in entity && typeof entity.id == "bigint")) return new Result.Err(Error());
 
     return new Result.Ok(new User(entity.id));
 }

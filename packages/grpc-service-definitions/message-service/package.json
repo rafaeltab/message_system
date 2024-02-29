@@ -9,8 +9,7 @@
         "dist/**/*.d.ts"  
     ],
     "scripts": {
-        "gen:buf": "rimraf /proto/ts/ && proto-loader-gen-types  --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=proto/ts/ proto/services/message/v1/*.proto && pnpm run patch:buf",
-        "patch:buf": "ts-node --esm ./patch/proto.ts",
+        "gen:buf": "rimraf /proto/ts/ && proto-loader-gen-types  --longs=String --enums=String --defaults --oneofs --grpcLib=@grpc/grpc-js --outDir=proto/ts/ proto/services/message/v1/*.proto",
         "build": "pnpm run clean && tsc",
         "clean": "rimraf dist/"
     },

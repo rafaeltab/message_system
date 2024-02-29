@@ -4,7 +4,11 @@ import { DbConfigProvider } from "./config";
 
 @injectable()
 export class PostgressConnection {
-    private post: postgres.Sql;
+    private post: postgres.Sql<{
+        bigint: bigint,
+        int: bigint
+    }>;
+
     constructor(@inject(DbConfigProvider) configProvider: DbConfigProvider) {
         const dbConf = configProvider.dbConfig;
         this.post = postgres({
@@ -13,7 +17,11 @@ export class PostgressConnection {
             ssl: "prefer",
             password: dbConf.password,
             username: dbConf.username,
-            port: dbConf.port
+            port: dbConf.port,
+            types: {
+                bigint: postgres.BigInt,
+                int: postgres.BigInt
+            }
         });
     }
 

@@ -25,9 +25,9 @@ export class ChatRepository extends IChatRepository {
 
     async getChat(users: [User, User]): Promise<Result<Option<Chat>, Error>> {
         const userA = users[0];
-        const userB = users[0];
+        const userB = users[1];
         const exists = await this.postConn.sql`
-            SELECT * FROM chat WHERE (user_a == ${userA.id} AND user_b == ${userB.id}) OR (user_a == ${userB.id} AND user_b == ${userA.id});
+            SELECT * FROM chat WHERE (user_a = ${userA.id} AND user_b = ${userB.id}) OR (user_a = ${userB.id} AND user_b = ${userA.id});
         `;
 
         if (exists.length == 0) {
@@ -44,7 +44,7 @@ export class ChatRepository extends IChatRepository {
 
 function parseFromRow(row: unknown, userA: User, userB: User): Result<Chat, Error> {
     if (typeof row !== "object" || row == null) return new Result.Err(Error());
-    if (!("user_a" in row && "user_b" in row && "id" in row && typeof row.user_a == "number" && typeof row.user_b == "number" && typeof row.id == "number")) {
+    if (!("user_a" in row && "user_b" in row && "id" in row && typeof row.user_a == "bigint" && typeof row.user_b == "bigint" && typeof row.id == "bigint")) {
         return new Result.Err(Error());
     }
     if (row.user_a == userA.id) {

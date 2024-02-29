@@ -34,11 +34,6 @@ export async function migrate(config: DbConfig, options: GlobalOptions) {
     }
 }
 
-async function dropTable(client: Client) {
-    const sql = `DROP TABLE pg_migrations`;
-    await client.query(sql);
-}
-
 async function ensureMigrationTableExists(client: Client) {
     const migration_table_res = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'pg_migrations');");
     const exists = migration_table_res.rows[0].exists as boolean;
@@ -47,7 +42,6 @@ async function ensureMigrationTableExists(client: Client) {
     const schema = `CREATE TABLE pg_migrations (
     name VARCHAR
 );`;
-    console.log("Database migration table not found, creating...");
     await client.query(schema);
 }
 
@@ -59,6 +53,5 @@ async function getPerformedMigrations(client: Client): Promise<Set<string>> {
 
 async function addMigration(client: Client, name: string) {
     const sql = `INSERT INTO pg_migrations VALUES ('${name}');`;
-    const result = await client.query(sql);
-    console.log(result);
+    await client.query(sql);
 }

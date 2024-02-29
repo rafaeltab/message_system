@@ -1,5 +1,5 @@
 import { User } from "./user";
 
 export class Chat {
-    constructor(public id: number, public userA: User, public userB: User) { }
+    constructor(public id: bigint, public userA: User, public userB: User) { }
 }
