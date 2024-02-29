@@ -17,6 +17,9 @@ import { MessageRepository } from "./infrastructure/repositories/message_reposit
 import { IChatRepository } from "./domain/repository/chat_repository";
 import { ChatRepository } from "./infrastructure/repositories/chat_repository";
 import { MessageFactory } from "./domain/factories/message_factory";
+import { DbConfigProvider } from "./db/config";
+import { DbConfigLoader } from "database-core";
+import { ImportConfigFileLoader } from "./config_loader";
 
 const container = new Container();
 container.bind<GetMessageHandler>(GetMessageHandler).to(GetMessageHandler);
@@ -37,6 +40,14 @@ container.bind(IMessageRepository).to(MessageRepository);
 container.bind(IChatRepository).to(ChatRepository);
 
 container.bind(MessageFactory).to(MessageFactory);
+
+const configFileProvider = new ImportConfigFileLoader("message-database");
+const configLoader = new DbConfigLoader(configFileProvider);
+const configProvider = new DbConfigProvider(configLoader, "docker");
+await configProvider.load();
+
+container.bind(DbConfigProvider).toConstantValue(configProvider);
+
 
 var parser = new MessageParser(strategies.map(x => new x()));
 await parser.compile();

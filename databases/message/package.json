@@ -3,7 +3,10 @@
     "version": "0.0.1",
     "private": true,
     "files": [
-        ".dbconfig.json"
+        ".dbconfig.json",
+        ".dbconfig.docker.json",
+        ".dbconfig.local.json",
+        ".dbconfig.kube.json"
     ],
     "scripts": {
         "db:setup": "db setup",

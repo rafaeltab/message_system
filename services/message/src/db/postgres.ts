@@ -1,13 +1,12 @@
 import postgres from "postgres";
-import config from "message-database/.dbconfig.json" assert { type: "json" };
-import { DbConfig } from "database-core";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
+import { DbConfigProvider } from "./config";
 
 @injectable()
 export class PostgressConnection {
     private post: postgres.Sql;
-    constructor() {
-        const dbConf: DbConfig = config;
+    constructor(@inject(DbConfigProvider) configProvider: DbConfigProvider) {
+        const dbConf = configProvider.dbConfig;
         this.post = postgres({
             db: dbConf.database,
             host: dbConf.host,
@@ -22,3 +21,4 @@ export class PostgressConnection {
         return this.post;
     }
 }
+

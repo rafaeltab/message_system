@@ -39,7 +39,6 @@ export class SendMessageKafkaHandler {
         var parseResult = this._parser.parse(message.value.toString());
         if (parseResult[0] != SendMessageRequestedStrategy.type) {
             return;
-
         }
 
         const model = parseResult[1] as SendMessageRequestedMessageModel;
@@ -48,6 +47,6 @@ export class SendMessageKafkaHandler {
             model.chat.from_user.user_id,
             model.content,
             model.created_at);
-        console.log(msg);
+        console.log("Stored a new message", msg);
     }
 }

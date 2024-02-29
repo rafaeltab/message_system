@@ -6,5 +6,3 @@
 > message-service@0.0.1 clean /home/rafaeltab/source/message_system/services/message
 > rimraf dist/
 
-../../databases/core/src/commands/setup.ts(14,22): error TS2554: Expected 1 arguments, but got 0.
- ELIFECYCLE  Command failed with exit code 1.
