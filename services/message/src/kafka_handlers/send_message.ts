@@ -8,8 +8,9 @@ import { inject, injectable } from "inversify";
 import { KafkaConsumer } from "../kafka/consumer";
 import { SendMessageTopic } from "../kafka/topics/send_message";
 import { EachMessagePayload } from "kafkajs";
-import { MessageParser, SendMessageRequestedMessageModel, SendMessageRequestedStrategy } from "kafka-messages";
+import { MessageParser, SendMessageCompleteStrategy, SendMessageCompletedMessageModel, SendMessageRequestedMessageModel, SendMessageRequestedStrategy } from "kafka-messages";
 import { MessageFactory } from "../domain/factories/message_factory";
+import { KafkaProducer } from "../kafka/producer";
 
 @injectable()
 export class SendMessageKafkaHandler {
@@ -18,6 +19,7 @@ export class SendMessageKafkaHandler {
         @inject(SendMessageTopic) private _topic: SendMessageTopic,
         @inject(MessageParser) private _parser: MessageParser,
         @inject(MessageFactory) private _messageFactory: MessageFactory,
+        @inject(SendMessageTopic) private _sendMessageTopic: SendMessageTopic,
     ) {
     }
 
@@ -42,15 +44,35 @@ export class SendMessageKafkaHandler {
             }
 
             const model = parseResult[1] as SendMessageRequestedMessageModel;
-            const msg = await this._messageFactory.createMessage(
+            const msgResult = await this._messageFactory.createMessage(
                 BigInt(model.chat.to_user.user_id),
                 BigInt(model.chat.from_user.user_id),
                 model.content,
                 model.created_at);
-            if (msg.isErr()) {
-                throw msg.asErr().error;
+            if (msgResult.isErr()) {
+                throw msgResult.asErr().error;
             }
-            console.log("Stored a new message", msg);
+
+            var kakfaMessage: SendMessageCompletedMessageModel = {
+                chat: {
+                    to_user: {
+                        user_id: model.chat.to_user.user_id.toString()
+                    },
+                    from_user: {
+                        user_id: model.chat.from_user.user_id.toString()
+                    }
+                },
+                type: SendMessageCompleteStrategy.type,
+                content: model.content,
+                created_at: model.created_at
+            }
+
+            await this._sendMessageTopic.send({
+                key: `${model.chat.to_user.user_id}-${model.chat.from_user.user_id}`,
+                value: kakfaMessage
+            });
+
+            console.log("Stored a new message", msgResult);
         } catch (err) {
             console.error(err);
             throw "";
