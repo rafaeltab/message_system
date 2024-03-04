@@ -1,0 +1,9 @@
+{
+    "name": "notification-service",
+    "version": "0.0.1",
+    "scripts": {
+        "build": "cargo build",
+        "start": "cargo run",
+        "dev": "cargo watch -x run"
+    }
+}
