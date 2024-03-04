@@ -16,8 +16,8 @@ use crate::{
 };
 
 pub struct SocketAdapter {
-    pub connection_manager: Arc<Mutex<Box<dyn ConnectionManager>>>,
-    pub route_source: Arc<Mutex<RouteSource>>,
+    pub connection_manager: Arc<Box<dyn ConnectionManager>>,
+    pub route_source: Arc<RouteSource>,
 }
 
 impl SocketAdapter {
@@ -26,8 +26,8 @@ impl SocketAdapter {
         route_source: RouteSource,
     ) -> &'static Self {
         Box::leak(Box::new(SocketAdapter {
-            connection_manager: Arc::new(Mutex::new(connection_manager)),
-            route_source: Arc::new(Mutex::new(route_source)),
+            connection_manager: Arc::new(connection_manager),
+            route_source: Arc::new(route_source),
         }))
     }
 
@@ -45,7 +45,6 @@ impl SocketAdapter {
     }
 
     async fn accept_connection(&self, stream: TcpStream) {
-        let connection_manager = self.connection_manager.lock().await;
         let addr = stream
             .peer_addr()
             .expect("connected streams should have a peer address");
@@ -80,7 +79,7 @@ impl SocketAdapter {
             .send(Message::Text("{\"message\": \"Registed\"}".to_string()))
             .await;
 
-        let add_result = connection_manager.add_connection(id, writer).await;
+        let add_result = self.connection_manager.add_connection(id, writer).await;
 
         // If an error occurs we take back ownership of the writer, and send a message indicating a
         // problem
@@ -93,16 +92,16 @@ impl SocketAdapter {
             return;
         }
 
-        let add_route_res = self.route_source.lock().await.add_route().await;
+        let add_route_res = self.route_source.add_route().await;
         if let Err(_) = add_route_res {
-            let _ = connection_manager
+            let _ = self.connection_manager
                 .send_message(
                     id,
                     Message::Text("{\"message\": \"Failed to register\"}".to_string()),
                 )
                 .await;
 
-            let _ = connection_manager.remove_connection(id);
+            let _ = self.connection_manager.remove_connection(id);
         }
 
         while let Some(Ok(msg)) = reader.next().await {
@@ -113,14 +112,14 @@ impl SocketAdapter {
                 Message::Binary(_) => (),
                 Message::Ping(_) => (),
                 Message::Pong(_) => (),
-                Message::Close(_) => connection_manager.remove_connection(id).await,
+                Message::Close(_) => self.connection_manager.remove_connection(id).await,
                 Message::Frame(_) => (),
             }
         }
     }
 
     async fn handle_text_message(
-        connection_manager: Arc<Mutex<Box<dyn ConnectionManager>>>,
+        connection_manager: Arc<Box<dyn ConnectionManager>>,
         msg: String,
     ) {
         let parse_res = msg.parse::<i64>();
@@ -131,8 +130,6 @@ impl SocketAdapter {
         let id = parse_res.unwrap();
         connection_manager
             .clone()
-            .lock()
-            .await
             .send_message(
                 id,
                 Message::Text("{\"message\": \"You received a message!\"}".to_string()),
@@ -144,8 +141,7 @@ impl SocketAdapter {
 #[async_trait]
 impl NotificationSink for SocketAdapter {
     async fn send_notification(&self, notification: Notification) {
-        let conn_manager = self.connection_manager.lock().await;
-        conn_manager
+        self.connection_manager
             .send_message(
                 notification.get_user_id().clone(),
                 Message::Text(notification.get_content().to_owned()),
