@@ -13,7 +13,7 @@ impl RouteSource {
     }
 
     pub async fn add_route(&self) -> Result<(), ()> {
-        todo!()
+        Ok(())
     }
 }
 

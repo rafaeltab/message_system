@@ -3,10 +3,7 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use futures_util::{SinkExt, StreamExt};
 use log::info;
-use tokio::{
-    net::{TcpListener, TcpStream},
-    sync::Mutex,
-};
+use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::{
@@ -15,15 +12,15 @@ use crate::{
     ports::{notification_port::NotificationSink, route_port::RouteSource},
 };
 
-pub struct SocketAdapter {
-    pub connection_manager: Arc<Box<dyn ConnectionManager>>,
-    pub route_source: Arc<RouteSource>,
+pub struct SocketAdapter<'a> {
+    pub connection_manager: Arc<&'a Box<dyn ConnectionManager>>,
+    pub route_source: Arc<&'a RouteSource>,
 }
 
-impl SocketAdapter {
+impl<'a> SocketAdapter<'a> {
     pub fn new(
-        connection_manager: Box<dyn ConnectionManager>,
-        route_source: RouteSource,
+        connection_manager: &'a Box<dyn ConnectionManager>,
+        route_source: &'a RouteSource,
     ) -> &'static Self {
         Box::leak(Box::new(SocketAdapter {
             connection_manager: Arc::new(connection_manager),
@@ -31,8 +28,7 @@ impl SocketAdapter {
         }))
     }
 
-    pub async fn start_listening(&'static self) {
-        let addr = "127.0.0.1:5001";
+    pub async fn start_listening(&'static self, addr: &str) {
         let try_socket = TcpListener::bind(&addr).await;
         let listener = try_socket.expect("Failed to bind to socket");
         info!("Listening on: {}", addr);
@@ -119,7 +115,7 @@ impl SocketAdapter {
     }
 
     async fn handle_text_message(
-        connection_manager: Arc<Box<dyn ConnectionManager>>,
+        connection_manager: Arc<&Box<dyn ConnectionManager>>,
         msg: String,
     ) {
         let parse_res = msg.parse::<i64>();
@@ -139,7 +135,7 @@ impl SocketAdapter {
 }
 
 #[async_trait]
-impl NotificationSink for SocketAdapter {
+impl<'a> NotificationSink for SocketAdapter<'a> {
     async fn send_notification(&self, notification: Notification) {
         self.connection_manager
             .send_message(
