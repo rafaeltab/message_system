@@ -92,7 +92,9 @@ services:
       - redis
     environment:
       REDIS_URL: redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@redis:6379/
-      LISTEN_URL: 0.0.0.0:5001
+      WEBSOCKET_URL: 0.0.0.0:5001
+      GRPC_URL: 0.0.0.0:5002
+      ROUTE_URL: grpc://notification:5002
     build: 
       context: .
       dockerfile: ./rust-dev.Dockerfile
@@ -103,6 +105,7 @@ services:
           path: ./
           target: /app
         - action: rebuild
-          path: ./rust-dev.dockerfile
+          path: ./rust-dev.Dockerfile
     ports:
       - 5001:5001
+      - 5002:5002

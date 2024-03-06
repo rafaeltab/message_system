@@ -25,7 +25,7 @@ impl RedisAdapter {
 #[async_trait]
 impl RouteSink for RedisAdapter {
     async fn save_route(&self, id: i64, route: String) -> Result<(), ()> {
-        info!("Saving route {}", id);
+        info!(id;"Saving route");
         match self
             .connection_manager
             .clone()
@@ -34,7 +34,7 @@ impl RouteSink for RedisAdapter {
         {
             Ok(_) => Ok(()),
             Err(err) => {
-                warn!("Failed saving route {} with: {}", id, err);
+                warn!(err:? = err, id; "Failed saving route");
                 Err(())
             }
         }
@@ -45,7 +45,7 @@ impl RouteSink for RedisAdapter {
         match self.connection_manager.clone().get::<i64, String>(id).await {
             Ok(val) => Ok(val),
             Err(err) => {
-                warn!("Failed getting route {} with: {}", id, err);
+                warn!(err:? = err, id; "Failed getting route");
                 Err(())
             }
         }
@@ -56,7 +56,7 @@ impl RouteSink for RedisAdapter {
         match self.connection_manager.clone().del::<i64, ()>(id).await {
             Ok(_) => Ok(()),
             Err(err) => {
-                warn!("Failed deleting route {} with {}", id, err);
+                warn!(err:? = err, id; "Failed deleting route");
                 Err(())
             }
         }

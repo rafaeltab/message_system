@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package notification;
+
+service Notification {
+    rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse);
+}
+
+message SendNotificationRequest {
+    int64 id = 1;
+    string notification = 2;
+}
+
+message SendNotificationResponse {
+
+}

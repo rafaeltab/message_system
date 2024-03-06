@@ -1,17 +1,19 @@
-use std::{
-    collections::HashMap, sync::Arc
-};
+use std::{collections::HashMap, error::Error, sync::Arc};
 
 use async_trait::async_trait;
 use futures_util::{stream::SplitSink, SinkExt};
-use tokio::{
-    net::TcpStream, sync::Mutex}
-;
+use tokio::{net::TcpStream, sync::Mutex};
 use tokio_tungstenite::{tungstenite::Message, WebSocketStream};
+
+use crate::ports::notification_port::LocalNotificationSink;
 
 #[async_trait]
 pub trait ConnectionManager: Send + Sync {
-    async fn add_connection(&self, id: i64, writer: SplitSink<WebSocketStream<TcpStream>, Message>) -> Result<(), SplitSink<WebSocketStream<TcpStream>, Message>>;
+    async fn add_connection(
+        &self,
+        id: i64,
+        writer: SplitSink<WebSocketStream<TcpStream>, Message>,
+    ) -> Result<(), SplitSink<WebSocketStream<TcpStream>, Message>>;
     async fn send_message(&self, id: i64, message: Message) -> bool;
     async fn remove_connection(&self, id: i64);
 }
@@ -30,7 +32,11 @@ impl ConnManager {
 
 #[async_trait]
 impl ConnectionManager for ConnManager {
-    async fn add_connection(&self, id: i64, writer: SplitSink<WebSocketStream<TcpStream>, Message>) -> Result<(), SplitSink<WebSocketStream<TcpStream>, Message>> {
+    async fn add_connection(
+        &self,
+        id: i64,
+        writer: SplitSink<WebSocketStream<TcpStream>, Message>,
+    ) -> Result<(), SplitSink<WebSocketStream<TcpStream>, Message>> {
         let mut connections = self.connections.lock().await;
         if connections.contains_key(&id) {
             return Err(writer);
@@ -56,9 +62,16 @@ impl ConnectionManager for ConnManager {
     async fn remove_connection(&self, id: i64) {
         let mut connections = self.connections.lock().await;
         if !connections.contains_key(&id) {
-            return
+            return;
         }
         connections.remove(&id);
     }
 }
 
+#[async_trait]
+impl LocalNotificationSink for ConnManager {
+    async fn has_local_connection(&self, id: i64) -> Result<bool, Box<dyn Error + Send + Sync>> {
+        let res = self.connections.lock().await.contains_key(&id);
+        Ok(res)
+    }
+}

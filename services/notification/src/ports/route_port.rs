@@ -2,6 +2,11 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 
+use crate::domain::route::{
+    exceptions::{create_error::CreateError, delete_error::DeleteError},
+    repositories::route_repository::RouteRepository,
+};
+
 #[async_trait]
 pub trait RouteSink: Send + Sync {
     async fn save_route(&self, id: i64, route: String) -> Result<(), ()>;
@@ -10,23 +15,23 @@ pub trait RouteSink: Send + Sync {
 }
 
 pub struct RouteSource<'a> {
-    route_sink: Arc<&'a Box<dyn RouteSink>>,
+    route_repository: &'a dyn RouteRepository,
 }
 
 impl<'a> RouteSource<'a> {
-    pub fn new(route_sink: &'a Box<dyn RouteSink>) -> Self {
+    pub fn new(route_repository: &'a dyn RouteRepository) -> Self {
         RouteSource {
-            route_sink: Arc::new(route_sink),
+            route_repository,
         }
     }
 
-    pub async fn del_route(&self, id: i64) -> Result<(), ()> {
-        let _res = self.route_sink.delete_route(id).await?;
+    pub async fn del_route(&self, id: i64) -> Result<(), DeleteError> {
+        let _res = self.route_repository.delete_route(&id).await?;
         Ok(())
     }
 
-    pub async fn add_route(&self, id: i64, route: String) -> Result<(), ()> {
-        let _res = self.route_sink.save_route(id, route).await?;
+    pub async fn add_route(&self, id: i64) -> Result<(), CreateError> {
+        let _res = self.route_repository.create_route(&id).await?;
         Ok(())
     }
 }

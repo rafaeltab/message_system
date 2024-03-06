@@ -1,13 +1,15 @@
 pub struct Route {
     id: i64,
-    server: String 
+    server: String,
+    is_local: bool
 }
 
 impl Route {
-    pub fn new(id: &i64, server: String) -> Route {
+    pub fn new(id: &i64, server: String, is_local: bool) -> Route {
         Route {
             id: id.clone(),
-            server
+            server,
+            is_local
         }
     }
 
@@ -17,5 +19,9 @@ impl Route {
 
     pub fn get_server(&self) -> &String {
         &self.server
+    }
+
+    pub fn is_local(&self) -> &bool {
+        &self.is_local
     }
 }

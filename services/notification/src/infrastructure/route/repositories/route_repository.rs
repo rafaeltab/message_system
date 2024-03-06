@@ -8,17 +8,25 @@ use crate::{
         exceptions::{create_error::CreateError, delete_error::DeleteError, get_error::GetError},
         repositories::route_repository::RouteRepository,
     },
-    ports::route_port::RouteSink,
+    ports::{notification_port::LocalNotificationSink, route_port::RouteSink},
 };
 
 pub struct RouteRepositoryImpl<'a> {
-    route_sink: Arc<&'a Box<dyn RouteSink>>,
+    route_sink: Arc<&'a dyn RouteSink>,
+    local_notification_sink: Arc<&'a dyn LocalNotificationSink>,
+    route: String,
 }
 
 impl<'a> RouteRepositoryImpl<'a> {
-    pub fn new(route_sink: &'a Box<dyn RouteSink>) -> Self {
+    pub fn new(
+        route_sink: &'a dyn RouteSink,
+        route: String,
+        local_notification_sink: &'a dyn LocalNotificationSink,
+    ) -> Self {
         RouteRepositoryImpl {
-            route_sink: Arc::new(route_sink)
+            route_sink: Arc::new(route_sink),
+            local_notification_sink: Arc::new(local_notification_sink),
+            route,
         }
     }
 }
@@ -26,24 +34,30 @@ impl<'a> RouteRepositoryImpl<'a> {
 #[async_trait]
 impl<'a> RouteRepository for RouteRepositoryImpl<'a> {
     async fn get_route(&self, id: &i64) -> Result<Route, GetError> {
-        match self.route_sink.get_route(*id).await {
-            Ok(val) => Ok(Route::new(id, val)),
-            Err(_) => Err(GetError::Unknown),
+        match self.local_notification_sink.has_local_connection(*id).await {
+            Ok(true) => Ok(Route::new(id, self.route.clone(), true)),
+            Ok(false) | Err(_) => match self.route_sink.get_route(*id).await {
+                Ok(val) => {
+                    // cool
+                    let is_local = val == self.route;
+                    Ok(Route::new(id, val, is_local))
+                }
+                Err(_) => Err(GetError::Unknown),
+            },
         }
     }
 
     async fn create_route(&self, id: &i64) -> Result<Route, CreateError> {
-        let route = "";
-        match self.route_sink.save_route(*id, route.to_string()).await {
-            Ok(_) => Ok(Route::new(id, route.to_string())),
-            Err(_) => Err(CreateError::Unknown)
+        match self.route_sink.save_route(*id, self.route.clone()).await {
+            Ok(_) => Ok(Route::new(id, self.route.clone(), true)),
+            Err(_) => Err(CreateError::Unknown),
         }
     }
 
     async fn delete_route(&self, id: &i64) -> Result<(), DeleteError> {
         match self.route_sink.delete_route(*id).await {
             Ok(_) => Ok(()),
-            Err(_) => Err(DeleteError::Unknown)
+            Err(_) => Err(DeleteError::Unknown),
         }
     }
 }

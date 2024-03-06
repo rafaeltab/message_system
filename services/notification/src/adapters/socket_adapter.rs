@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{error::Error, sync::Arc};
 
 use async_trait::async_trait;
 use futures_util::{SinkExt, StreamExt};
@@ -8,33 +8,30 @@ use tokio_tungstenite::tungstenite::Message;
 
 use crate::{
     connection_manager::ConnectionManager,
-    domain::{
-        notification::aggregates::notification::Notification,
-        route::repositories::route_repository::RouteRepository,
-    },
-    ports::notification_port::NotificationSink,
+    domain::notification::aggregates::notification::Notification,
+    ports::{notification_port::NotificationSink, route_port::RouteSource},
 };
 
 pub struct SocketAdapter<'a> {
-    pub connection_manager: Arc<&'a Box<dyn ConnectionManager>>,
-    pub route_repository: Arc<&'a Box<dyn RouteRepository>>,
+    pub connection_manager: Arc<&'a dyn ConnectionManager>,
+    pub route_source: Arc<&'a RouteSource<'a>>,
 }
 
 impl<'a> SocketAdapter<'a> {
     pub fn new(
-        connection_manager: &'a Box<dyn ConnectionManager>,
-        route_repository: &'a Box<dyn RouteRepository>,
+        connection_manager: &'a dyn ConnectionManager,
+        route_source: &'a RouteSource,
     ) -> &'static Self {
         Box::leak(Box::new(SocketAdapter {
             connection_manager: Arc::new(connection_manager),
-            route_repository: Arc::new(route_repository),
+            route_source: Arc::new(route_source),
         }))
     }
 
     pub async fn start_listening(&'static self, addr: String) {
         let try_socket = TcpListener::bind(&addr).await;
         let listener = try_socket.expect("Failed to bind to socket");
-        info!("Listening on: {}", addr);
+        info!("Websocket listening on: {}", addr);
 
         while let Ok((stream, _)) = listener.accept().await {
             tokio::spawn(async {
@@ -95,7 +92,7 @@ impl<'a> SocketAdapter<'a> {
             return;
         }
 
-        let add_route_res = self.route_repository.create_route(&id).await;
+        let add_route_res = self.route_source.add_route(id).await;
         if let Err(_) = add_route_res {
             let _ = self
                 .connection_manager
@@ -119,7 +116,7 @@ impl<'a> SocketAdapter<'a> {
                 Message::Ping(_) => (),
                 Message::Pong(_) => (),
                 Message::Close(_) => {
-                    let _ = self.route_repository.delete_route(&id).await;
+                    let _ = self.route_source.del_route(id).await;
                     // TODO figure out what to do if we fail to delete from redis
                     self.connection_manager.remove_connection(id).await
                 }
@@ -129,7 +126,7 @@ impl<'a> SocketAdapter<'a> {
     }
 
     async fn handle_text_message(
-        connection_manager: Arc<&Box<dyn ConnectionManager>>,
+        connection_manager: Arc<&dyn ConnectionManager>,
         msg: String,
     ) {
         let parse_res = msg.parse::<i64>();
