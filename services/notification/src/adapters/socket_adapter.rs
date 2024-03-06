@@ -2,33 +2,36 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use futures_util::{SinkExt, StreamExt};
-use log::info;
+use log::{error, info};
 use tokio::net::{TcpListener, TcpStream};
 use tokio_tungstenite::tungstenite::Message;
 
 use crate::{
     connection_manager::ConnectionManager,
-    domain::notification::aggregates::notification::Notification,
-    ports::{notification_port::NotificationSink, route_port::RouteSource},
+    domain::{
+        notification::aggregates::notification::Notification,
+        route::repositories::route_repository::RouteRepository,
+    },
+    ports::notification_port::NotificationSink,
 };
 
 pub struct SocketAdapter<'a> {
     pub connection_manager: Arc<&'a Box<dyn ConnectionManager>>,
-    pub route_source: Arc<&'a RouteSource>,
+    pub route_repository: Arc<&'a Box<dyn RouteRepository>>,
 }
 
 impl<'a> SocketAdapter<'a> {
     pub fn new(
         connection_manager: &'a Box<dyn ConnectionManager>,
-        route_source: &'a RouteSource,
+        route_repository: &'a Box<dyn RouteRepository>,
     ) -> &'static Self {
         Box::leak(Box::new(SocketAdapter {
             connection_manager: Arc::new(connection_manager),
-            route_source: Arc::new(route_source),
+            route_repository: Arc::new(route_repository),
         }))
     }
 
-    pub async fn start_listening(&'static self, addr: &str) {
+    pub async fn start_listening(&'static self, addr: String) {
         let try_socket = TcpListener::bind(&addr).await;
         let listener = try_socket.expect("Failed to bind to socket");
         info!("Listening on: {}", addr);
@@ -85,19 +88,26 @@ impl<'a> SocketAdapter<'a> {
                     "{\"message\": \"Failed to register\"}".to_string(),
                 ))
                 .await;
+            error!(
+                "{}",
+                "Failed to register a client because the add_result had an error"
+            );
             return;
         }
 
-        let add_route_res = self.route_source.add_route().await;
+        let add_route_res = self.route_repository.create_route(&id).await;
         if let Err(_) = add_route_res {
-            let _ = self.connection_manager
+            let _ = self
+                .connection_manager
                 .send_message(
                     id,
                     Message::Text("{\"message\": \"Failed to register\"}".to_string()),
                 )
                 .await;
 
-            let _ = self.connection_manager.remove_connection(id);
+            error!("Failed to register a client because adding the route to the source failed");
+
+            self.connection_manager.remove_connection(id).await;
         }
 
         while let Some(Ok(msg)) = reader.next().await {
@@ -108,7 +118,11 @@ impl<'a> SocketAdapter<'a> {
                 Message::Binary(_) => (),
                 Message::Ping(_) => (),
                 Message::Pong(_) => (),
-                Message::Close(_) => self.connection_manager.remove_connection(id).await,
+                Message::Close(_) => {
+                    let _ = self.route_repository.delete_route(&id).await;
+                    // TODO figure out what to do if we fail to delete from redis
+                    self.connection_manager.remove_connection(id).await
+                }
                 Message::Frame(_) => (),
             }
         }

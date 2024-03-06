@@ -1,6 +1,9 @@
 version: '3.5'
 volumes:
   redpanda: null
+  cache: null
+  cockroach:
+    driver: local
 services:
   crdb:
     container_name: crdb
@@ -10,7 +13,7 @@ services:
       - "8080:8080"
     command: start-single-node --insecure
     volumes:
-      - "${PWD}/cockroach-data/crdb:/cockroach/cockroach-data"
+      - "cockroach:/cockroach/cockroach-data"
   redpanda:
     container_name: redpanda
     image: docker.redpanda.com/redpandadata/redpanda:v23.3.4
@@ -46,6 +49,14 @@ services:
       timeout: 3s
       retries: 5
       start_period: 5s
+  redis:
+    image: redis:7.2-alpine
+    restart: always
+    ports:
+        - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes: 
+      - cache:/data
   message:
     build: 
       context: .
@@ -76,4 +87,22 @@ services:
           path: ./services/socket/dev.dockerfile
     ports:
       - 3000:3000
-
+  notification:
+    depends_on: 
+      - redis
+    environment:
+      REDIS_URL: redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@redis:6379/
+      LISTEN_URL: 0.0.0.0:5001
+    build: 
+      context: .
+      dockerfile: ./rust-dev.Dockerfile
+      target: notification-service
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+        - action: rebuild
+          path: ./rust-dev.dockerfile
+    ports:
+      - 5001:5001

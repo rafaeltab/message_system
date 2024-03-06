@@ -1,4 +1,4 @@
 pub enum GetError {
-
+    Unknown
 }
 

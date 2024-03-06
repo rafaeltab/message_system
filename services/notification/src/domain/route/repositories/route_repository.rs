@@ -1,7 +1,13 @@
-use crate::domain::route::{aggregates::route::Route, exceptions::{create_error::CreateError, delete_error::DeleteError, get_error::GetError}};
+use async_trait::async_trait;
 
-pub trait RouteRepository {
-    fn get_route(id: &i64) -> Result<Route, GetError>;
-    fn create_route(id: &i64) -> Result<Route, CreateError>;
-    fn delete_route(id: &i64) -> Result<Route, DeleteError>;
+use crate::domain::route::{
+    aggregates::route::Route,
+    exceptions::{create_error::CreateError, delete_error::DeleteError, get_error::GetError},
+};
+
+#[async_trait]
+pub trait RouteRepository: Send + Sync {
+    async fn get_route(&self, id: &i64) -> Result<Route, GetError>;
+    async fn create_route(&self, id: &i64) -> Result<Route, CreateError>;
+    async fn delete_route(&self, id: &i64) -> Result<(), DeleteError>;
 }
