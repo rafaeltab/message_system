@@ -35,12 +35,12 @@ impl<'a> RouteRepositoryImpl<'a> {
 impl<'a> RouteRepository for RouteRepositoryImpl<'a> {
     async fn get_route(&self, id: &i64) -> Result<Route, GetError> {
         match self.local_notification_sink.has_local_connection(*id).await {
-            Ok(true) => Ok(Route::new(id, self.route.clone(), true)),
+            Ok(true) => Ok(Route::new(self.route.clone(), true)),
             Ok(false) | Err(_) => match self.route_sink.get_route(*id).await {
                 Ok(val) => {
                     // cool
                     let is_local = val == self.route;
-                    Ok(Route::new(id, val, is_local))
+                    Ok(Route::new(val, is_local))
                 }
                 Err(_) => Err(GetError::Unknown),
             },
@@ -49,7 +49,7 @@ impl<'a> RouteRepository for RouteRepositoryImpl<'a> {
 
     async fn create_route(&self, id: &i64) -> Result<Route, CreateError> {
         match self.route_sink.save_route(*id, self.route.clone()).await {
-            Ok(_) => Ok(Route::new(id, self.route.clone(), true)),
+            Ok(_) => Ok(Route::new(self.route.clone(), true)),
             Err(_) => Err(CreateError::Unknown),
         }
     }

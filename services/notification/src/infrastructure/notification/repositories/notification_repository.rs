@@ -1,3 +1,4 @@
+use log::info;
 use tonic::async_trait;
 
 use crate::{
@@ -8,22 +9,27 @@ use crate::{
         },
         route::repositories::route_repository::RouteRepository,
     },
-    ports::notification_port::NotificationSink,
+    ports::{
+        notification_forward_port::NotificationForwardSink, notification_port::NotificationSink,
+    },
 };
 
 pub struct NotificationRepositoryImpl<'a> {
     route_repository: &'a dyn RouteRepository,
     notification_sink: &'a dyn NotificationSink,
+    notification_forward_sink: &'a dyn NotificationForwardSink,
 }
 
 impl<'a> NotificationRepositoryImpl<'a> {
     pub fn new(
         route_repository: &'a dyn RouteRepository,
         notification_sink: &'a dyn NotificationSink,
+        notification_forward_sink: &'a dyn NotificationForwardSink,
     ) -> Self {
         NotificationRepositoryImpl {
             route_repository,
             notification_sink,
+            notification_forward_sink,
         }
     }
 }
@@ -47,6 +53,15 @@ impl<'a> NotificationRepository for NotificationRepositoryImpl<'a> {
             return Ok(());
         }
 
-        todo!()
+        info!(route = route.get_server(); "Route not found locally, forwarding notification");
+
+        match self
+            .notification_forward_sink
+            .forward_notification(notification, route)
+            .await
+        {
+            Ok(_) => Ok(()),
+            Err(_) => Err(SendError::UnableToSend),
+        }
     }
 }

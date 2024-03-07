@@ -7,21 +7,19 @@ mod ports;
 use std::io::Error;
 
 use adapters::{
-    redis_adapter::RedisAdapter, socket_adapter::SocketAdapter, tonic_adapter::TonicAdapter,
+    redis_adapter::RedisAdapter, socket_adapter::SocketAdapter,
+    tonic_sink_adapter::TonicSinkAdapter, tonic_source_adapter::TonicSourceAdapter,
 };
 use clap::Parser;
-use connection_manager::{ConnManager, ConnectionManager};
-use domain::{
-    notification::repositories::notification_repository::NotificationRepository,
-    route::repositories::route_repository::RouteRepository,
-};
+use connection_manager::ConnManager;
+use domain::route::repositories::route_repository::RouteRepository;
 use futures_util::future::join_all;
 use infrastructure::{
-    notification::repositories::notification_repository::{self, NotificationRepositoryImpl},
+    notification::repositories::notification_repository::NotificationRepositoryImpl,
     route::repositories::route_repository::RouteRepositoryImpl,
 };
 use ports::{
-    notification_port::{LocalNotificationSink, NotificationSource},
+    notification_port::NotificationSource,
     route_port::{RouteSink, RouteSource},
 };
 use structured_logger::{async_json::new_writer, Builder};
@@ -65,19 +63,21 @@ async fn main() -> Result<(), Error> {
 
     let socket_adapter = SocketAdapter::new(connection_manager, route_source);
 
+    let tonic_sink_adapter = Box::leak(Box::new(TonicSinkAdapter::default()));
     let notification_repository = Box::leak(Box::new(NotificationRepositoryImpl::new(
         route_repository,
         socket_adapter,
+        tonic_sink_adapter,
     )));
 
     let notification_source = Box::leak(Box::new(NotificationSource::new(notification_repository)));
-    let tonic_adapter = TonicAdapter::new(notification_source);
+    let tonic_source_adapter = TonicSourceAdapter::new(notification_source);
     join_all(vec![
         tokio::spawn(async {
             socket_adapter.start_listening(args.websocket_url).await;
         }),
         tokio::spawn(async move {
-            let _ = tonic_adapter.start_listening(args.grpc_url).await;
+            let _ = tonic_source_adapter.start_listening(args.grpc_url).await;
         }),
     ])
     .await;

@@ -9,13 +9,13 @@ use super::tonic::notification_service::{
     notification_proto::notification_server::NotificationServer, NotificationService,
 };
 
-pub struct TonicAdapter {
+pub struct TonicSourceAdapter {
     notification_source: Arc<&'static NotificationSource<'static>>,
 }
 
-impl TonicAdapter {
+impl TonicSourceAdapter {
     pub fn new(notification_source: &'static NotificationSource) -> Self {
-        TonicAdapter {
+        TonicSourceAdapter {
             notification_source: Arc::new(notification_source),
         }
     }
