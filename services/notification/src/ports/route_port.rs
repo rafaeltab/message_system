@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use async_trait::async_trait;
 
 use crate::domain::route::{
@@ -12,12 +14,12 @@ pub trait RouteSink: Send + Sync {
     async fn delete_route(&self, id: i64) -> Result<(), ()>;
 }
 
-pub struct RouteSource<'a> {
-    route_repository: &'a dyn RouteRepository,
+pub struct RouteSource {
+    route_repository: Arc<dyn RouteRepository>,
 }
 
-impl<'a> RouteSource<'a> {
-    pub fn new(route_repository: &'a dyn RouteRepository) -> Self {
+impl RouteSource {
+    pub fn new(route_repository: Arc<dyn RouteRepository>) -> Self {
         RouteSource {
             route_repository,
         }

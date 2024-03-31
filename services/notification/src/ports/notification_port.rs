@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use std::error::Error;
+use std::{error::Error, sync::Arc};
 
 use crate::domain::notification::{
     aggregates::notification::Notification,
@@ -16,12 +16,12 @@ pub trait LocalNotificationSink: Sync + Send {
     async fn has_local_connection(&self, id: i64) -> Result<bool, Box<dyn Error + Send + Sync>>;
 }
 
-pub struct NotificationSource<'a> {
-    notification_repository: &'a dyn NotificationRepository,
+pub struct NotificationSource {
+    notification_repository: Arc<dyn NotificationRepository>,
 }
 
-impl<'a> NotificationSource<'a> {
-    pub fn new(notification_repository: &'a dyn NotificationRepository) -> Self {
+impl NotificationSource {
+    pub fn new(notification_repository: Arc<dyn NotificationRepository>) -> Self {
         NotificationSource {
             notification_repository,
         }

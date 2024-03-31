@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use log::info;
 use tonic::async_trait;
 
@@ -14,17 +16,17 @@ use crate::{
     },
 };
 
-pub struct NotificationRepositoryImpl<'a> {
-    route_repository: &'a dyn RouteRepository,
-    notification_sink: &'a dyn NotificationSink,
-    notification_forward_sink: &'a dyn NotificationForwardSink,
+pub struct NotificationRepositoryImpl {
+    route_repository: Arc<dyn RouteRepository>,
+    notification_sink: Arc<dyn NotificationSink>,
+    notification_forward_sink: Arc<dyn NotificationForwardSink>,
 }
 
-impl<'a> NotificationRepositoryImpl<'a> {
+impl NotificationRepositoryImpl {
     pub fn new(
-        route_repository: &'a dyn RouteRepository,
-        notification_sink: &'a dyn NotificationSink,
-        notification_forward_sink: &'a dyn NotificationForwardSink,
+        route_repository: Arc<dyn RouteRepository>,
+        notification_sink: Arc<dyn NotificationSink>,
+        notification_forward_sink: Arc<dyn NotificationForwardSink>,
     ) -> Self {
         NotificationRepositoryImpl {
             route_repository,
@@ -35,7 +37,7 @@ impl<'a> NotificationRepositoryImpl<'a> {
 }
 
 #[async_trait]
-impl<'a> NotificationRepository for NotificationRepositoryImpl<'a> {
+impl NotificationRepository for NotificationRepositoryImpl {
     async fn send_notification(&self, notification: Notification) -> Result<(), SendError> {
         let res = self
             .route_repository

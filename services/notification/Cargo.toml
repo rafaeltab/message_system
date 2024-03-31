@@ -10,6 +10,7 @@ futures-util = "0.3.30"
 log = { version = "0.4.21", features = ["kv", "kv_std"] }
 prost = "0.12.3"
 r2d2 = "0.8.10"
+rdkafka = "0.36.2"
 redis = { version = "0.24.0", features = ["tokio-comp", "r2d2", "connection-manager"] }
 simple_logger = "4.3.3"
 structured-logger = { version = "1.0.3", default-features = false }

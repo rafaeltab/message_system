@@ -12,30 +12,32 @@ use crate::{
     ports::{notification_port::NotificationSink, route_port::RouteSource},
 };
 
-pub struct SocketAdapter<'a> {
-    pub connection_manager: Arc<&'a dyn ConnectionManager>,
-    pub route_source: Arc<&'a RouteSource<'a>>,
+pub struct SocketAdapter {
+    pub connection_manager: Arc<dyn ConnectionManager>,
+    pub route_source: Arc<RouteSource>,
 }
 
-impl<'a> SocketAdapter<'a> {
+impl SocketAdapter {
     pub fn new(
-        connection_manager: &'a dyn ConnectionManager,
-        route_source: &'a RouteSource,
-    ) -> &'static Self {
-        Box::leak(Box::new(SocketAdapter {
-            connection_manager: Arc::new(connection_manager),
-            route_source: Arc::new(route_source),
-        }))
+        connection_manager: Arc<dyn ConnectionManager>,
+        route_source: Arc<RouteSource>,
+    ) -> Self {
+        SocketAdapter {
+            connection_manager,
+            route_source,
+        }
     }
 
-    pub async fn start_listening(&'static self, addr: String) {
+    pub async fn start_listening(self: Arc<Self>, addr: String) {
         let try_socket = TcpListener::bind(&addr).await;
         let listener = try_socket.expect("Failed to bind to socket");
         info!("Websocket listening on: {}", addr);
 
+
         while let Ok((stream, _)) = listener.accept().await {
-            tokio::spawn(async {
-                self.accept_connection(stream).await;
+            let self_clone = self.clone();
+            tokio::spawn(async move {
+                self_clone.accept_connection(stream).await;
             });
         }
     }
@@ -126,7 +128,7 @@ impl<'a> SocketAdapter<'a> {
     }
 
     async fn handle_text_message(
-        connection_manager: Arc<&dyn ConnectionManager>,
+        connection_manager: Arc<dyn ConnectionManager>,
         msg: String,
     ) {
         let parse_res = msg.parse::<i64>();
@@ -146,7 +148,7 @@ impl<'a> SocketAdapter<'a> {
 }
 
 #[async_trait]
-impl<'a> NotificationSink for SocketAdapter<'a> {
+impl NotificationSink for SocketAdapter {
     async fn send_notification(&self, notification: Notification) {
         self.connection_manager
             .send_message(

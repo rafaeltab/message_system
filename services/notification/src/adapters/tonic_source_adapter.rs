@@ -10,17 +10,17 @@ use super::tonic::notification_service::{
 };
 
 pub struct TonicSourceAdapter {
-    notification_source: Arc<&'static NotificationSource<'static>>,
+    notification_source: Arc<NotificationSource>,
 }
 
 impl TonicSourceAdapter {
-    pub fn new(notification_source: &'static NotificationSource) -> Self {
+    pub fn new(notification_source: Arc<NotificationSource>) -> Self {
         TonicSourceAdapter {
-            notification_source: Arc::new(notification_source),
+            notification_source,
         }
     }
 
-    pub async fn start_listening(&self, addr: String) -> Result<(), Box<dyn Error>> {
+    pub async fn start_listening(self: Arc<Self>, addr: String) -> Result<(), Box<dyn Error>> {
         let notification_service = NotificationService::new(Arc::clone(&self.notification_source));
 
         let reflection_service = tonic_reflection::server::Builder::configure()

@@ -11,28 +11,28 @@ use crate::{
     ports::{notification_port::LocalNotificationSink, route_port::RouteSink},
 };
 
-pub struct RouteRepositoryImpl<'a> {
-    route_sink: Arc<&'a dyn RouteSink>,
-    local_notification_sink: Arc<&'a dyn LocalNotificationSink>,
+pub struct RouteRepositoryImpl {
+    route_sink: Arc<dyn RouteSink>,
+    local_notification_sink: Arc<dyn LocalNotificationSink>,
     route: String,
 }
 
-impl<'a> RouteRepositoryImpl<'a> {
+impl RouteRepositoryImpl {
     pub fn new(
-        route_sink: &'a dyn RouteSink,
+        route_sink: Arc<dyn RouteSink>,
         route: String,
-        local_notification_sink: &'a dyn LocalNotificationSink,
+        local_notification_sink: Arc<dyn LocalNotificationSink>,
     ) -> Self {
         RouteRepositoryImpl {
-            route_sink: Arc::new(route_sink),
-            local_notification_sink: Arc::new(local_notification_sink),
+            route_sink,
+            local_notification_sink,
             route,
         }
     }
 }
 
 #[async_trait]
-impl<'a> RouteRepository for RouteRepositoryImpl<'a> {
+impl RouteRepository for RouteRepositoryImpl {
     async fn get_route(&self, id: &i64) -> Result<Route, GetError> {
         match self.local_notification_sink.has_local_connection(*id).await {
             Ok(true) => Ok(Route::new(self.route.clone(), true)),

@@ -13,12 +13,12 @@ pub mod notification_proto {
         tonic::include_file_descriptor_set!("notification_descriptor");
 }
 
-pub struct NotificationService<'a> {
-    notification_source: Arc<&'a NotificationSource<'a>>,
+pub struct NotificationService {
+    notification_source: Arc<NotificationSource>,
 }
 
-impl<'a> NotificationService<'a> {
-    pub fn new(notification_source: Arc<&'a NotificationSource>) -> Self {
+impl NotificationService {
+    pub fn new(notification_source: Arc<NotificationSource>) -> Self {
         NotificationService {
             notification_source,
         }
@@ -26,7 +26,7 @@ impl<'a> NotificationService<'a> {
 }
 
 #[tonic::async_trait]
-impl Notification for NotificationService<'static> {
+impl Notification for NotificationService {
     async fn send_notification(
         &self,
         request: tonic::Request<notification_proto::SendNotificationRequest>,
