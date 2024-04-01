@@ -3,7 +3,7 @@ import { DbConfig } from "../config/definition.js";
 import { GlobalOptions } from "../global_options.js";
 import { join } from "path";
 import { driverFactory } from "../drivers/driver.js";
-import { Client } from "pg";
+import pg from "pg";
 
 export async function migrate(config: DbConfig, options: GlobalOptions) {
     // Get the project folder
@@ -14,7 +14,7 @@ export async function migrate(config: DbConfig, options: GlobalOptions) {
     let driver = driverFactory(config);
     await driver.waitTillOnline();
 
-    const client = new Client({
+    const client = new pg.Client({
         host: config.host,
         user: config.username,
         password: config.password,
@@ -34,7 +34,7 @@ export async function migrate(config: DbConfig, options: GlobalOptions) {
     }
 }
 
-async function ensureMigrationTableExists(client: Client) {
+async function ensureMigrationTableExists(client: pg.Client) {
     const migration_table_res = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'pg_migrations');");
     const exists = migration_table_res.rows[0].exists as boolean;
     if (exists == true) return;
@@ -45,13 +45,13 @@ async function ensureMigrationTableExists(client: Client) {
     await client.query(schema);
 }
 
-async function getPerformedMigrations(client: Client): Promise<Set<string>> {
+async function getPerformedMigrations(client: pg.Client): Promise<Set<string>> {
     const sql = `SELECT * FROM pg_migrations;`;
     const result = await client.query(sql);
     return new Set(result.rows.map(x => x.name));
 }
 
-async function addMigration(client: Client, name: string) {
+async function addMigration(client: pg.Client, name: string) {
     const sql = `INSERT INTO pg_migrations VALUES ('${name}');`;
     await client.query(sql);
 }

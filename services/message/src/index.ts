@@ -10,6 +10,7 @@ import { GetMessageHandler } from "./rpc_handlers/get_message";
 import { container } from "./inversify.config";
 import { SendMessageTopic } from "./kafka/topics/send_message";
 import { SendMessageKafkaHandler } from "./kafka_handlers/send_message";
+import { ReflectionService } from "@grpc/reflection";
 
 const PORT = 4000;
 const PROTO_FILES = await getProtoFiles();
@@ -18,6 +19,8 @@ const packageDef = await protoLoader.load(PROTO_FILES, {});
 const grpcObj = loadPackageDefinition(packageDef) as unknown as ProtoGrpcType;
 
 const server = new Server();
+const reflection = new ReflectionService(packageDef);
+reflection.addToServer(server);
 await container.get(SendMessageTopic).ensureCreated();
 
 var messageHandler = container.get(SendMessageKafkaHandler);
@@ -30,7 +33,7 @@ server.bindAsync(`0.0.0.0:${PORT}`, ServerCredentials.createInsecure(), () => {
 });
 
 server.addService(grpcObj.services.message.v1.MessageService.service, {
-    GetMessages: (req, res) => {container.get(GetMessageHandler).handleMessage(req, res)},
-    SendMessage: (req, res) => {container.get(SendMessageHandler).handleMessage(req, res)},
+    GetMessages: (req, res) => { container.get(GetMessageHandler).handleMessage(req, res) },
+    SendMessage: (req, res) => { container.get(SendMessageHandler).handleMessage(req, res) },
 } satisfies MessageServiceHandlers);
 

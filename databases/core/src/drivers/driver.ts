@@ -1,6 +1,6 @@
 import { DbConfig } from ".."
-import { DockerDriver } from "./docker_driver";
-import { KubectlDriver } from "./kubectl_driver";
+import { DockerDriver } from "./docker_driver.js";
+import { KubectlDriver } from "./kubectl_driver.js";
 
 export interface IDriver {
     waitTillOnline(): Promise<void>

@@ -11,7 +11,8 @@ RUN apt update && apt install -y musl-tools \
     pkg-config \
     python3 \
     valgrind \
-    zlib1g-dev
+    zlib1g-dev \
+    libsasl2-dev 
 
 RUN update-ca-certificates
 RUN cargo install cargo-watch

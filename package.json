@@ -18,6 +18,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@grpc/reflection": "^1.0.3",
+    "message-service": "^1.0.9",
     "turbo": "^1.10.13"
   }
 }

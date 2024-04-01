@@ -1,0 +1,19 @@
+redis:
+  url: redis://:eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81@redis:6379/
+web_socket:
+  url: 0.0.0.0:5001
+grpc:
+  url: 0.0.0.0:5002
+route:
+  url: grpc://notification:5002
+kafka:
+  brokers:
+    - redpanda:9092
+  group_id: notification-service
+  topics:
+    - message_message
+  workers: 2
+  sasl: 
+    mechanism: SCRAM-SHA-512 
+    username: notification
+    password: notification

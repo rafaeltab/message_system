@@ -13,4 +13,8 @@ rpk profile set user=admin pass=admin sasl.mechanism=scram-sha-512
 rpk acl user create message -p message --mechanism scram-sha-512
 rpk acl create --allow-principal User:message --operation write,read --topic message_message
 
+rpk acl user create notification -p notification --mechanism scram-sha-512
+rpk acl create --allow-principal User:notification --operation describe,read --topic message_message
+rpk acl create --allow-principal User:notification --operation describe,read,write --group notification-service
+
 rpk topic create message_message -p 10 -r 1

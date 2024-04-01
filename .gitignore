@@ -5,4 +5,4 @@ terraform.tfvars
 cockroach-data
 .terraform.lock.hcl
 target
-.turbo
+**/.turbo/**

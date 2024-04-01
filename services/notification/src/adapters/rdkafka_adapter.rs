@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use futures_util::{stream::FuturesUnordered, StreamExt, TryStreamExt};
+use log::info;
 use rdkafka::{
     consumer::{Consumer, StreamConsumer},
     error::KafkaError,
@@ -16,6 +17,14 @@ pub struct RdkafkaConfig<'a> {
     pub group_id: &'a str,
     pub topics: &'a [&'a str],
     pub workers: i32,
+    pub sasl: Option<RdkafkaSaslConfig<'a>>,
+}
+
+#[derive(Copy, Clone)]
+pub struct RdkafkaSaslConfig<'a> {
+    pub mechanism: &'a str,
+    pub username: &'a str,
+    pub password: &'a str,
 }
 
 pub struct RdkafkaAdapter {
@@ -34,8 +43,9 @@ impl RdkafkaAdapter {
             .into_iter()
             .map(|_| {
                 let self_clone = Arc::clone(&self);
+                let config_clone = config.clone();
                 tokio::spawn(async move {
-                    self_clone.listen_once(config.clone()).await;
+                    self_clone.listen_once(config_clone).await;
                 })
             })
             .collect::<FuturesUnordered<_>>()
@@ -44,14 +54,24 @@ impl RdkafkaAdapter {
     }
 
     async fn listen_once<'a>(&self, config: RdkafkaConfig<'a>) {
-        let consumer: StreamConsumer = ClientConfig::new()
+        let mut client_config = ClientConfig::new();
+        client_config
             .set("group.id", config.group_id)
             .set("bootstrap.servers", config.brokers)
             .set("enable.partition.eof", "false")
             .set("session.timeout.ms", "6000")
-            .set("enable.auto.commit", "false")
-            .create()
-            .expect("Consumer creation failed");
+            .set("enable.auto.commit", "false");
+
+        if let Some(sasl) = config.sasl {
+            info!("Configuring rdkafka with SASL");
+            client_config
+                .set("security.protocol", "SASL_PLAINTEXT")
+                .set("sasl.mechanism", sasl.mechanism)
+                .set("sasl.username", sasl.username)
+                .set("sasl.password", sasl.password);
+        }
+
+        let consumer: StreamConsumer = client_config.create().expect("Consumer creation failed");
 
         consumer
             .subscribe(config.topics)
@@ -70,20 +90,41 @@ impl RdkafkaAdapter {
         &self,
         borrowed_message: BorrowedMessage<'_>,
     ) -> Result<(), KafkaError> {
-        let key = borrowed_message
+        let key: Vec<&str> = borrowed_message
             .key_view::<str>()
             .expect("No key provided")
             .expect("Key was not a utf-8 string")
+            .split("-")
+            .collect();
+
+        if key.len() != 2 {
+            return Ok(());
+        }
+
+        let user_a = key[0]
             .parse::<i64>()
-            .expect("Key was not an integer");
+            .expect("Key did not contain a number-number");
+
+        let user_b = key[1]
+            .parse::<i64>()
+            .expect("Key did not contain a number-number");
+
         let message = borrowed_message
             .payload_view::<str>()
             .expect("No payload provided")
             .expect("Payload was not a utf-8 string");
 
-        let _ = self.notification_source
-            .send_notification(&key, message.to_string())
+        let _ = self
+            .notification_source
+            .send_notification(&user_a, message.to_string())
             .await;
+        info!(id=user_a;"Sent notification");
+
+        let _ = self
+            .notification_source
+            .send_notification(&user_b, message.to_string())
+            .await;
+        info!(id=user_b;"Sent notification");
         Ok(())
     }
 }
