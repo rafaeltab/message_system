@@ -1,8 +1,0 @@
-
-> message-service@0.0.1 build /home/rafaeltab/source/message_system/services/message
-> pnpm run clean && tsc -b
-
-
-> message-service@0.0.1 clean /home/rafaeltab/source/message_system/services/message
-> rimraf dist/
-

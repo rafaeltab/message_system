@@ -18,8 +18,10 @@ pub trait ConnectionManager: Send + Sync {
     async fn remove_connection(&self, id: i64);
 }
 
+type Connections = Arc<Mutex<HashMap<i64, SplitSink<WebSocketStream<TcpStream>, Message>>>>;
+
 pub struct ConnManager {
-    pub connections: Arc<Mutex<HashMap<i64, SplitSink<WebSocketStream<TcpStream>, Message>>>>,
+    connections: Connections,
 }
 
 impl ConnManager {
@@ -59,6 +61,7 @@ impl ConnectionManager for ConnManager {
         }
     }
 
+    // TODO remove the redis connection too
     async fn remove_connection(&self, id: i64) {
         let mut connections = self.connections.lock().await;
         if !connections.contains_key(&id) {

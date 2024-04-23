@@ -1,9 +1,10 @@
 use async_trait::async_trait;
+use log::info;
 use std::{error::Error, sync::Arc};
 
 use crate::domain::notification::{
     aggregates::notification::Notification,
-    repositories::notification_repository::NotificationRepository,
+    repositories::notification_repository::{NotificationRepository, SendResult},
 };
 
 #[async_trait]
@@ -33,6 +34,10 @@ impl NotificationSource {
             .send_notification(Notification::new(id, message))
             .await
         {
+            Ok(SendResult::NotificationSent) => {
+                info!(id;"Sent notification");
+                Ok(())
+            }
             Ok(_) => Ok(()),
             Err(_) => Err(()),
         }

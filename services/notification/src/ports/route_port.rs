@@ -10,7 +10,7 @@ use crate::domain::route::{
 #[async_trait]
 pub trait RouteSink: Send + Sync {
     async fn save_route(&self, id: i64, route: String) -> Result<(), ()>;
-    async fn get_route(&self, id: i64) -> Result<String, ()>;
+    async fn get_route(&self, id: i64) -> Result<Option<String>, ()>;
     async fn delete_route(&self, id: i64) -> Result<(), ()>;
 }
 
@@ -26,12 +26,12 @@ impl RouteSource {
     }
 
     pub async fn del_route(&self, id: i64) -> Result<(), DeleteError> {
-        let _res = self.route_repository.delete_route(&id).await?;
+        self.route_repository.delete_route(&id).await?;
         Ok(())
     }
 
     pub async fn add_route(&self, id: i64) -> Result<(), CreateError> {
-        let _res = self.route_repository.create_route(&id).await?;
+        self.route_repository.create_route(&id).await?;
         Ok(())
     }
 }

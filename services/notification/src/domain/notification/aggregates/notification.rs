@@ -6,7 +6,7 @@ pub struct Notification {
 impl Notification {
     pub fn new(user_id: &i64, content: String) -> Notification {
         Notification {
-            user_id: user_id.clone(),
+            user_id: *user_id,
             content
         }
     }

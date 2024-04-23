@@ -40,9 +40,22 @@ impl RouteSink for RedisAdapter {
         }
     }
 
-    async fn get_route(&self, id: i64) -> Result<String, ()> {
+    // TODO use test containers to verify the different scenarios
+    async fn get_route(&self, id: i64) -> Result<Option<String>, ()> {
         info!("Getting route {}", id);
-        match self.connection_manager.clone().get::<i64, String>(id).await {
+        let exists = match self.connection_manager.clone().exists::<i64, bool>(id).await {
+            Ok(val) => val,
+            Err(err) => {
+                warn!(err:? = err, id; "Failed checking if route exists");
+                false
+            }
+        };
+
+        if !exists {
+            return Ok(None);
+        }
+
+        match self.connection_manager.clone().get::<i64, Option<String>>(id).await {
             Ok(val) => Ok(val),
             Err(err) => {
                 warn!(err:? = err, id; "Failed getting route");
@@ -62,3 +75,5 @@ impl RouteSink for RedisAdapter {
         }
     }
 }
+
+

@@ -40,20 +40,18 @@ impl RdkafkaAdapter {
 
     pub async fn start_listening(self: Arc<Self>, config: RdkafkaConfig<'static>) {
         (0..config.workers)
-            .into_iter()
-            .map(|_| {
+            .map(|i| {
                 let self_clone = Arc::clone(&self);
-                let config_clone = config.clone();
                 tokio::spawn(async move {
-                    self_clone.listen_once(config_clone).await;
+                    self_clone.listen_once(&i, config).await;
                 })
             })
             .collect::<FuturesUnordered<_>>()
-            .for_each(|_| async { () })
+            .for_each(|_| async { })
             .await;
     }
 
-    async fn listen_once<'a>(&self, config: RdkafkaConfig<'a>) {
+    async fn listen_once<'a>(&self, worker_index: &i32, config: RdkafkaConfig<'a>) {
         let mut client_config = ClientConfig::new();
         client_config
             .set("group.id", config.group_id)
@@ -63,7 +61,7 @@ impl RdkafkaAdapter {
             .set("enable.auto.commit", "false");
 
         if let Some(sasl) = config.sasl {
-            info!("Configuring rdkafka with SASL");
+            info!(worker_index;"Configuring rdkafka with SASL");
             client_config
                 .set("security.protocol", "SASL_PLAINTEXT")
                 .set("sasl.mechanism", sasl.mechanism)
@@ -94,7 +92,7 @@ impl RdkafkaAdapter {
             .key_view::<str>()
             .expect("No key provided")
             .expect("Key was not a utf-8 string")
-            .split("-")
+            .split('-')
             .collect();
 
         if key.len() != 2 {
@@ -118,13 +116,12 @@ impl RdkafkaAdapter {
             .notification_source
             .send_notification(&user_a, message.to_string())
             .await;
-        info!(id=user_a;"Sent notification");
 
         let _ = self
             .notification_source
             .send_notification(&user_b, message.to_string())
             .await;
-        info!(id=user_b;"Sent notification");
+
         Ok(())
     }
 }

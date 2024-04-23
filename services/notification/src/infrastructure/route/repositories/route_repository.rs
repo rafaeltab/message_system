@@ -33,17 +33,24 @@ impl RouteRepositoryImpl {
 
 #[async_trait]
 impl RouteRepository for RouteRepositoryImpl {
-    async fn get_route(&self, id: &i64) -> Result<Route, GetError> {
+    async fn get_route(&self, id: &i64) -> Result<Option<Route>, GetError> {
         match self.local_notification_sink.has_local_connection(*id).await {
-            Ok(true) => Ok(Route::new(self.route.clone(), true)),
+            Ok(true) => Ok(Some(Route::new(self.route.clone(), true))),
             Ok(false) | Err(_) => match self.route_sink.get_route(*id).await {
                 Ok(val) => {
-                    // cool
-                    let is_local = val == self.route;
-                    Ok(Route::new(val, is_local))
+                    // TODO what to do if the local_notificaton_sink returns false on
+                    // has_local_connection, but redis says it should be available locally
+                    if val.is_none() {
+                        return Ok(None);
+                    };
+                    let route = val.unwrap();
+
+                    let is_local = route == self.route;
+                    Ok(Some(Route::new(route, is_local)))
                 }
                 Err(_) => Err(GetError::Unknown),
             },
+            // TODO handle error
         }
     }
 

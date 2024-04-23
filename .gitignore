@@ -6,3 +6,4 @@ cockroach-data
 .terraform.lock.hcl
 target
 **/.turbo/**
+.log

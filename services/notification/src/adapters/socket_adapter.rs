@@ -95,7 +95,7 @@ impl SocketAdapter {
         }
 
         let add_route_res = self.route_source.add_route(id).await;
-        if let Err(_) = add_route_res {
+        if add_route_res.is_err() {
             let _ = self
                 .connection_manager
                 .send_message(
@@ -118,6 +118,8 @@ impl SocketAdapter {
                 Message::Ping(_) => (),
                 Message::Pong(_) => (),
                 Message::Close(_) => {
+                    // TODO why does this not work when closing the page, but does it work when
+                    // calling the method?
                     let _ = self.route_source.del_route(id).await;
                     // TODO figure out what to do if we fail to delete from redis
                     self.connection_manager.remove_connection(id).await
@@ -152,7 +154,7 @@ impl NotificationSink for SocketAdapter {
     async fn send_notification(&self, notification: Notification) {
         self.connection_manager
             .send_message(
-                notification.get_user_id().clone(),
+                *notification.get_user_id(),
                 Message::Text(notification.get_content().to_owned()),
             )
             .await;

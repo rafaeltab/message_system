@@ -8,6 +8,7 @@ use crate::{
         notification::{
             aggregates::notification::Notification, exceptions::send_error::SendError,
             repositories::notification_repository::NotificationRepository,
+            repositories::notification_repository::SendResult,
         },
         route::repositories::route_repository::RouteRepository,
     },
@@ -38,21 +39,26 @@ impl NotificationRepositoryImpl {
 
 #[async_trait]
 impl NotificationRepository for NotificationRepositoryImpl {
-    async fn send_notification(&self, notification: Notification) -> Result<(), SendError> {
+    async fn send_notification(&self, notification: Notification) -> Result<SendResult, SendError> {
         let res = self
             .route_repository
             .get_route(notification.get_user_id())
             .await;
 
-        if let Err(_) = res {
-            return Err(SendError::ClientNotFound);
+        if res.is_err() {
+            return Err(SendError::UnableToSend);
         }
 
-        let route = res.unwrap();
+        let result = res.unwrap();
+        if result.is_none() {
+            return Ok(SendResult::ClientNotConnected);
+        }
+
+        let route = result.unwrap();
 
         if *route.is_local() {
             self.notification_sink.send_notification(notification).await;
-            return Ok(());
+            return Ok(SendResult::NotificationSent);
         }
 
         info!(route = route.get_server(); "Route not found locally, forwarding notification");
@@ -62,7 +68,7 @@ impl NotificationRepository for NotificationRepositoryImpl {
             .forward_notification(notification, route)
             .await
         {
-            Ok(_) => Ok(()),
+            Ok(_) => Ok(SendResult::NotificationSent),
             Err(_) => Err(SendError::UnableToSend),
         }
     }
