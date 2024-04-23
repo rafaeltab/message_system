@@ -44,6 +44,6 @@ describe("SendMessageRequestedStrategy.validate", async () => {
 
         const result = sut.validate(given);
 
-        expect(result).toEqual(false)
+        expect(result).toEqual(false);
     });
 });

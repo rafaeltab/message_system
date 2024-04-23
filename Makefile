@@ -6,6 +6,9 @@ build:
 test:
 	turbo run test
 
+ci:
+	turbo run build test
+
 docker:
 	docker compose build
 	docker compose up -d
