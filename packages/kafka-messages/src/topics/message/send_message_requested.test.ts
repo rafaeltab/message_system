@@ -1,5 +1,5 @@
 import { expect, it, describe } from "vitest";
-import { SendMessageRequestedMessageModel, SendMessageRequestedStrategy,  } from "./send_message_requested";
+import { SendMessageRequestedMessageModel, SendMessageRequestedStrategy, } from "./send_message_requested";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
 
@@ -14,10 +14,10 @@ describe("SendMessageRequestedStrategy.validate", async () => {
             type: "SendMessageRequested",
             chat: {
                 from_user: {
-                    user_id: "john"    
+                    user_id: 28813
                 },
                 to_user: {
-                    user_id: "marie"    
+                    user_id: 4881
                 }
             },
             content: "Johns farm",
@@ -33,10 +33,10 @@ describe("SendMessageRequestedStrategy.validate", async () => {
         var given = {
             chat: {
                 from_user: {
-                    user_id: "john"    
+                    user_id: "john"
                 },
                 to_user: {
-                    user_id: "marie"    
+                    user_id: "marie"
                 }
             },
             content: "Johns farm",

@@ -1,11 +1,21 @@
 .PHONY: dev
 
+build: 
+	turbo run build
+
+test:
+	turbo run test
+
+docker:
+	docker compose build
+	docker compose up -d
+
 dev:
-	# docker compose build
-	# docker compose up -d
 	docker compose watch & docker compose logs -f
 
 clean:
-	rm -rf **/.turbo/**
+	find ./ | grep /.turbo | xargs rm -r
+	turbo run clean
 
 clean-cache:
+	rm -rf node_modules/.cache/turbo
